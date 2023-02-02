@@ -5,11 +5,13 @@ cat('
     for (i in 1:n){
       pp_log_RS[i] ~ dnorm(mu_log_RS[i],tau)
       mu_log_RS[i] <- lnalpha - betaW * Sw[i] - betaH * Sh[i] + b1 * ocean_surv[i] + b2 * basin[i]
+      
       ###  do we analyse all pops in one model or develop separate models for each? one model for all seems preferable
       ###  do we need a covariate to capture the effects of dam passage?
       ###  what other covariates do we need?
       ###  should we/can we include a random term?
       ###  smooth terms?
+      ###  AR(IMA) terms?
       
       alpha <- exp(lnalpha)
 
@@ -73,3 +75,34 @@ fit.logRS_0 <- jags(data = cbpSARequiv.lawDat,
 logRS_0.paramlist <- fit.logRS_0$BUGSoutput$sims.list
 logRS_0.loglik <- logRS_0.paramlist$loglik
 logRS_0.waic <- waic(logRS_0.loglik)
+
+### need to provide trace plots for each parameter
+logRS_0.mcmc <- as.mcmc(fit.logRS_0)
+logRS_0.ggs.dat <- ggs(logRS_0.mcmc)
+
+### trace plots
+#### log(alpha)
+logRS_0_lnalpha.trPlot <- ggs_traceplot(logRS_0.ggs.dat, family = "lnalpha")+
+  theme_bw()+
+  theme(panel.border = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(color = "black"),
+        axis.title.y = element_text(face = "bold", size = 16,vjust = 1,margin = margin(t = 0, r = 50, b = 0, l = 0),family = "Calibri"),
+        axis.title.x = element_text(face = "bold", size = 16,vjust = -1,margin = margin(t = 10, r = 0, b = 0, l = 0),family = "Calibri"),
+        axis.text.x = element_text(face = "bold",size = 14,color="black", vjust=0.5,family = "Calibri"),
+        axis.text.y = element_text(face = "bold",size = 14,color="black",family = "Calibri"),
+        strip.background = element_blank(),
+        legend.position = "none",
+        strip.text.x = element_blank(),
+        legend.title = element_text(face = "bold",size = 12,color="black",family = "Calibri"),
+        plot.margin = margin(0.5, 1, 0.5, 0.5, "cm"),
+        legend.text=element_text(face = "bold",size = 12,color="black",family = "Calibri"),
+        axis.ticks.length = unit(0.15, "cm"))+
+  labs(title = "log(alpha)",y = "Value", x = "Iteration") +
+  annotate(geom = "text",
+           x = post_dim(logRS_0.mcmc,"saved")/post_dim(logRS_0.mcmc,"chains"),
+           y = max(MCMCchains(logRS_0.mcmc, params = 'lnalpha')),
+           label = paste("hat(R)","~`=`~",round(as.numeric(fit.logRS_0$BUGSoutput$summary[1,8]),3),sep=""),
+           hjust = 1.0,vjust=0.0,size = 5.1,family = "Calibri",parse = TRUE)+ # Rhat has to be Changed based on jags output (extraction rounds to nearest interger)
+  theme(plot.title = element_text(hjust = 0.5,size = 16,face = "bold",family = "Calibri"))
