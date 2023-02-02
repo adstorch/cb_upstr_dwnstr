@@ -1,5 +1,14 @@
 # call packages -----------------------------------------------------------
-packages <- c("openxlsx")
+packages <- c("openxlsx",
+              "ggplot2",
+              "R2jags",
+              "ggmcmc",
+              "scales",
+              "postpack",
+              "MCMCvis",
+              "car",
+              "extrafont",
+              "remotes")
 
 if (!require(install.load)) {
   install.packages("install.load")
