@@ -1,4 +1,5 @@
-### specify model
+# model 1: global model ---------------------------------------------------
+## specify model
 cat('
   model {
     # Likelihood
@@ -53,14 +54,14 @@ cat('
     
   }', file={logRS_0.jags <- tempfile()})
 
-### define parameters to monitor
+## define parameters to monitor
 params.logRS_0 <- c(lnalpha, # log(alpha) term
                     betaW, # beta for wild spawners
                     betaH, # beta for hatchery spawners
                     b1, # effect of ocean survival 
                     tau) # error term)
 
-### call jags
+## call jags
 fit.logRS_0 <- jags(data = cbpSARequiv.lawDat,
                     inits = inits.law,
                     parameters.to.save = params.law,
@@ -71,12 +72,13 @@ fit.logRS_0 <- jags(data = cbpSARequiv.lawDat,
                     n.thin = 10,
                     DIC = F)
 
-### extract log-likelihood and calculate waic score
+## extract log-likelihood and calculate waic score
 logRS_0.paramlist <- fit.logRS_0$BUGSoutput$sims.list
 logRS_0.loglik <- logRS_0.paramlist$loglik
 logRS_0.waic <- waic(logRS_0.loglik)
 
-### need to provide trace plots for each parameter
+## diagnostics
+### extract simulations
 logRS_0.mcmc <- as.mcmc(fit.logRS_0)
 logRS_0.ggs.dat <- ggs(logRS_0.mcmc)
 
@@ -106,3 +108,9 @@ logRS_0_lnalpha.trPlot <- ggs_traceplot(logRS_0.ggs.dat, family = "lnalpha")+
            label = paste("hat(R)","~`=`~",round(as.numeric(fit.logRS_0$BUGSoutput$summary[1,8]),3),sep=""),
            hjust = 1.0,vjust=0.0,size = 5.1,family = "Calibri",parse = TRUE)+ # Rhat has to be Changed based on jags output (extraction rounds to nearest interger)
   theme(plot.title = element_text(hjust = 0.5,size = 16,face = "bold",family = "Calibri"))
+
+### combined plots
+
+
+
+### density plots
