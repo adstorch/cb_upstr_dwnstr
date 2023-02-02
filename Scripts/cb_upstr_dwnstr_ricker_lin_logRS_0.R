@@ -4,12 +4,9 @@ cat('
     # Likelihood
     for (i in 1:n){
       pp_log_RS[i] ~ dnorm(mu_log_RS[i],tau)
-      mu_log_RS[i] <- lnalpha - betaW * Sw[i] - betaH*Sh[i] + b1 * ocean_surv[i] + b2 * basin[i]
-      
+      mu_log_RS[i] <- lnalpha - betaW * Sw[i] - betaH * Sh[i] + b1 * ocean_surv[i] + b2 * basin[i]
       alpha <- exp(lnalpha)
-      
-      
-      
+
       # # # res.law[i] <- sar.law[i] - mu.law[i]
       # # # sar.new[i] ~ dt(mu.law[i],tau.law,nu.law)
       # # # res.sar.new[i] <- sar.new[i] - mu.law[i]
@@ -66,7 +63,7 @@ fit.logRS_0 <- jags(data = cbpSARequiv.lawDat,
                     n.thin = 10,
                     DIC = F)
 
-### extract log log-likelihood and calculate waic
+### extract log-likelihood and calculate waic score
 logRS_0.paramlist <- fit.logRS_0$BUGSoutput$sims.list
 logRS_0.loglik <- logRS_0.paramlist$loglik
 logRS_0.waic <- waic(logRS_0.loglik)
