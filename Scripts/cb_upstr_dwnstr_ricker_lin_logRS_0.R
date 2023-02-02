@@ -5,6 +5,12 @@ cat('
     for (i in 1:n){
       pp_log_RS[i] ~ dnorm(mu_log_RS[i],tau)
       mu_log_RS[i] <- lnalpha - betaW * Sw[i] - betaH * Sh[i] + b1 * ocean_surv[i] + b2 * basin[i]
+      ###  do we analyse all pops in one model or develop separate models for each? one model for all seems preferable
+      ###  do we need a covariate to capture the effects of dam passage?
+      ###  what other covariates do we need?
+      ###  should we/can we include a random term?
+      ###  smooth terms?
+      
       alpha <- exp(lnalpha)
 
       # # # res.law[i] <- sar.law[i] - mu.law[i]
