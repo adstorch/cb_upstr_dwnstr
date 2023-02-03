@@ -12,6 +12,13 @@ logRS_0.dat<- list(log_RS=as.numeric(log(cb_upstr_dwnstr.dat$rs)),
 ## specify model
 cat('
   model {
+  
+  
+  
+  # seems like we should code this as a nested random effect (basin|popn) and generate predictions with one/that model to draw comparisons
+  
+  
+  
     # Likelihood
     for (i in 1:nObs){
     for (j in nBasin){
