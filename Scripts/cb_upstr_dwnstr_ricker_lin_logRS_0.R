@@ -1,21 +1,25 @@
 # model 1: global model ---------------------------------------------------
 ## specify data
-logRS_0.dat
-
-
-
+logRS_0.dat<- list(log_RS=as.numeric(log(cb_upstr_dwnstr.dat$rs)),
+                   S=cb_upstr_dwnstr.dat$tot_spnrs,
+                   basin=cb_upstr_dwnstr.dat$basin_index,
+                   nObs=length(cb_upstr_dwnstr.dat$rs),
+                   nBasin=max(cb_upstr_dwnstr.dat$basin_index))
 
 ## specify model
 cat('
   model {
     # Likelihood
-    for (i in 1:n){
+    for (i in 1:nObs){
+    for (j in nBasin){
       
       # mu_basin[basin_vec[i]] ~ dnorm(0, taua)
       # mu_pop[pop_vec[i]] ~ dnorm(mu_basin[basin_vec[i]], taub_a)
       
-      log_RS[i] ~ dnorm(mu_log_RS[i],tau)
-      mu_log_RS[i] <- lnalpha - beta * S[i] + b1 * basin[]
+      log_RS[i,j] ~ dnorm(mu_log_RS[i,j],tau)
+      mu_log_RS[i,j] <- lnalpha - beta * S[i,j]
+      
+      # + b1 * basin[]
       
       # + mu_pop[pop_vec[i]]
       
@@ -26,7 +30,7 @@ cat('
       ###  smooth terms?
       ###  AR(IMA) terms?
       
-      alpha <- exp(lnalpha)
+     
       
       # # # res.law[i] <- sar.law[i] - mu.law[i]
       # # # sar.new[i] ~ dt(mu.law[i],tau.law,nu.law)
@@ -45,6 +49,9 @@ cat('
       # # discrepancy/squared residuals for new/ideal data
       # law.SqResid.new[i]<-pow(sar.new[i]-law.pred[i],2)
     }
+    }
+    
+     alpha[j] <- exp(lnalpha)
     
     # Priors
     lnalpha ~ dunif(0,3) # prior for alpha truncated at 0: maximum number of recruits per spawner at low stock size OR slope of line at origin
@@ -52,25 +59,25 @@ cat('
     b1 ~ dnorm(0, 1) # prior for effect of ocean survival
     tau ~ dgamma(0.01, 0.01) # prior error
     
-    # derived values
-    ## sum of squared residuals for actual dataset
-    law.sumsqO<-sum(law.SqResid[])
-    ## sum of squared residuals for new dataset
-    law.sumsqN<-sum(law.SqResid.new[])
-    ## test whether new data are more extreme
-    law.test<-step(law.sumsqN-law.sumsqO)
-    ## bayesian pvalue
-    law.bpval<-mean(law.test)
+    # # derived values
+    # ## sum of squared residuals for actual dataset
+    # law.sumsqO<-sum(law.SqResid[])
+    # ## sum of squared residuals for new dataset
+    # law.sumsqN<-sum(law.SqResid.new[])
+    # ## test whether new data are more extreme
+    # law.test<-step(law.sumsqN-law.sumsqO)
+    # ## bayesian pvalue
+    # law.bpval<-mean(law.test)
     
     
   }', file={logRS_0.jags <- tempfile()})
 
 ## define parameters to monitor
-logRS_0.params <- c(lnalpha, # log(alpha) term
-                    betaW, # beta for wild spawners
-                    betaH, # beta for hatchery spawners
-                    b1, # effect of ocean survival 
-                    tau) # error term)
+logRS_0.params <- c("lnalpha", # log(alpha) term
+                    "beta", # beta for wild spawners
+                    # "b1", # effect of ocean survival 
+                    "tau",
+                    "alpha") # error term)
 
 ## call jags
 fit.logRS_0 <- jags.parallel(data = logRS_0.dat,
