@@ -1,0 +1,118 @@
+Site,Species,Season,Year,Brood Year,Estimate,95LB,95UB
+Middle Fork,Chinook,fall,2004,2003,723,589,914
+Middle Fork,Chinook,fall,2005,2004,818,698,949
+Middle Fork,Chinook,fall,2006,2005,NA,NA,NA
+Middle Fork,Chinook,fall,2007,2006,127,107,156
+Middle Fork,Chinook,fall,2008,2007,NA,NA,NA
+Middle Fork,Chinook,fall,2009,2008,8187,7267,9279
+Middle Fork,Chinook,fall,2010,2009,1203,1125,1291
+Middle Fork,Chinook,fall,2011,2010,2746,2306,3376
+Middle Fork,Chinook,fall,2012,2011,18655,17891,19480
+Middle Fork,Chinook,fall,2013,2012,16870,15664,18195
+Middle Fork,Chinook,fall,2014,2013,556,397,820
+Middle Fork,Chinook,fall,2015,2014,58,51,66
+Middle Fork,Chinook,fall,2016,2015,10368,9255,11557
+Middle Fork,Chinook,fall,2017,2016,5615,4475,7007
+Middle Fork,Chinook,fall,2018,2017,5749,5395,6102
+Middle Fork,Chinook,fall,2019,2018,571,409,733
+Middle Fork,Chinook,fall,2020,2019,657,596,718
+Middle Fork,Chinook,fall,2021,2020,10510,10261,10758
+Middle Fork,Chinook,spring,2004,2002,19425,15807,24535
+Middle Fork,Chinook,spring,2005,2003,19355,16525,22469
+Middle Fork,Chinook,spring,2006,2004,18465,14423,24186
+Middle Fork,Chinook,spring,2007,2005,13454,11366,16521
+Middle Fork,Chinook,spring,2008,2006,7382,5553,9990
+Middle Fork,Chinook,spring,2009,2007,30332,26924,34379
+Middle Fork,Chinook,spring,2010,2008,34262,32056,36777
+Middle Fork,Chinook,spring,2011,2009,12457,10461,18239
+Middle Fork,Chinook,spring,2012,2010,29214,28019,30507
+Middle Fork,Chinook,spring,2013,2011,32271,29088,35708
+Middle Fork,Chinook,spring,2014,2012,18347,12386,27789
+Middle Fork,Chinook,spring,2015,2013,6249,5489,7073
+Middle Fork,Chinook,spring,2016,2014,15990,14272,17823
+Middle Fork,Chinook,spring,2017,2015,22319,15130,33013
+Middle Fork,Chinook,spring,2018,2016,19534,19237,19831
+Middle Fork,Chinook,spring,2019,2017,1236,1106,1367
+Middle Fork,Chinook,spring,2020,2018,15723,15445,16001
+Middle Fork,Chinook,spring,2021,2019,26025,25657,26392
+Mainstem,Chinook,fall,2004,2003,3159,2553,4060
+Mainstem,Chinook,fall,2005,2004,3500,3153,3899
+Mainstem,Chinook,fall,2006,2005,NA,NA,NA
+Mainstem,Chinook,fall,2007,2006,NA,NA,NA
+Mainstem,Chinook,fall,2008,2007,16055,14225,18130
+Mainstem,Chinook,fall,2009,2008,25897,22338,30331
+Mainstem,Chinook,fall,2010,2009,23923,20686,27867
+Mainstem,Chinook,fall,2011,2010,51646,46295,58222
+Mainstem,Chinook,fall,2012,2011,117731,107061,130071
+Mainstem,Chinook,fall,2013,2012,84660,78588,91053
+Mainstem,Chinook,fall,2014,2013,40360,34630,47841
+Mainstem,Chinook,fall,2015,2014,50244,42565,59890
+Mainstem,Chinook,fall,2016,2015,53007,47472,59855
+Mainstem,Chinook,fall,2017,2016,43013,38208,49092
+Mainstem,Chinook,fall,2018,2017,68524,67961,69087
+Mainstem,Chinook,fall,2019,2018,30676,30289,31063
+Mainstem,Chinook,fall,2020,2019,42417,41949,42885
+Mainstem,Chinook,fall,2021,2020,27525,27152,27898
+Mainstem,Chinook,spring,2004,2002,51809,41867,66593
+Mainstem,Chinook,spring,2005,2003,30195,27202,33634
+Mainstem,Chinook,spring,2006,2004,33642,21006,61272
+Mainstem,Chinook,spring,2007,2005,32236,25263,42043
+Mainstem,Chinook,spring,2008,2006,30250,26802,34160
+Mainstem,Chinook,spring,2009,2007,48064,41457,56292
+Mainstem,Chinook,spring,2010,2008,31367,27124,36539
+Mainstem,Chinook,spring,2011,2009,30596,27426,34491
+Mainstem,Chinook,spring,2012,2010,65646,59697,72527
+Mainstem,Chinook,spring,2013,2011,61968,54865,70159
+Mainstem,Chinook,spring,2014,2012,41452,34109,50552
+Mainstem,Chinook,spring,2015,2013,41853,35456,49888
+Mainstem,Chinook,spring,2016,2014,45668,40889,51568
+Mainstem,Chinook,spring,2017,2015,24228,21521,27652
+Mainstem,Chinook,spring,2018,2016,75297,74714,75880
+Mainstem,Chinook,spring,2019,2017,11328,11092,11564
+Mainstem,Chinook,spring,2020,2018,30915,30504,31326
+Mainstem,Chinook,spring,2021,2019,25761,25414,26109
+seine,Chinook,NA,1980,1978,169000,80000,257000
+seine,Chinook,NA,1981,1979,83000,52000,113000
+seine,Chinook,NA,1982,1980,94000,1000,211000
+seine,Chinook,NA,1983,1981,64000,40000,89000
+seine,Chinook,NA,1984,1982,78000,64000,93000
+seine,Chinook,NA,2000,1998,38770,30663,50539
+seine,Chinook,NA,2001,1999,81848,69362,97991
+seine,Chinook,NA,2002,2000,85726,73557,98895
+seine,Chinook,NA,2003,2001,83228,75887,91107
+seine,Chinook,NA,2004,2002,93174,75872,113900
+seine,Chinook,NA,2005,2003,124293,94346,164680
+seine,Chinook,NA,2006,2004,74293,39507,149530
+seine,Chinook,NA,2007,2005,41905,33307,53984
+seine,Chinook,NA,2008,2006,70319,60580,82802
+seine,Chinook,NA,2009,2007,55055,46842,64957
+seine,Chinook,NA,2010,2008,141531,123997,161164
+seine,Chinook,NA,2011,2009,NA,NA,NA
+seine,Chinook,NA,2012,2010,95726,76875,120082
+seine,Chinook,NA,2013,2011,102357,86583,121347
+seine,Chinook,NA,2014,2012,84792,71483,101741
+seine,Chinook,NA,2015,2013,55502,37592,84188
+seine,Chinook,NA,2016,2014,72067,53325,102389
+seine,Chinook,NA,2017,2015,112550,85774,157616
+seine,Chinook,NA,2018,2016,111325,84263,138386
+seine,Chinook,NA,2019,2017,54569,16607,106447
+seine,Chinook,NA,2020,2018,NA,NA,NA
+seine,Chinook,NA,2021,2019,68187,50836,85539
+South Fork,Chinook,NA,2004,2002,NA,NA,NA
+South Fork,Chinook,NA,2005,2003,NA,NA,NA
+South Fork,Chinook,NA,2006,2004,NA,NA,NA
+South Fork,Chinook,NA,2007,2005,825,695,999
+South Fork,Chinook,NA,2008,2006,1321,1140,1538
+South Fork,Chinook,NA,2009,2007,NA,NA,NA
+South Fork,Chinook,NA,2010,2008,204,148,283
+South Fork,Chinook,NA,2011,2009,723,450,1199
+South Fork,Chinook,NA,2012,2010,477,362,649
+South Fork,Chinook,NA,2013,2011,864,722,979
+South Fork,Chinook,NA,2014,2012,1464,1052,1573
+South Fork,Chinook,NA,2015,2013,636,420,997
+South Fork,Chinook,NA,2016,2014,957,761,1199
+South Fork,Chinook,NA,2017,2015,969,696,2045
+South Fork,Chinook,NA,2018,2016,806,742,870
+South Fork,Chinook,NA,2019,2017,1727,1631,1824
+South Fork,Chinook,NA,2020,2018,1050,978,1121
+South Fork,Chinook,NA,2021,2019,1408,1301,1515
