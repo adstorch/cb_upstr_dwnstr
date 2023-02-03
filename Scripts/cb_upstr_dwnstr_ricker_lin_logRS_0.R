@@ -17,7 +17,7 @@ cat('
       # mu_pop[pop_vec[i]] ~ dnorm(mu_basin[basin_vec[i]], taub_a)
       
       log_RS[i,j] ~ dnorm(mu_log_RS[i,j],tau)
-      mu_log_RS[i,j] <- lnalpha - beta * S[i,j]
+      mu_log_RS[i,j] <- lnalpha[j] - beta * S[i,j]
       
       # + b1 * basin[]
       
