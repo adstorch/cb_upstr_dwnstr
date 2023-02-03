@@ -1,11 +1,23 @@
 # model 1: global model ---------------------------------------------------
+## specify data
+logRS_0.dat
+
+
+
+
 ## specify model
 cat('
   model {
     # Likelihood
     for (i in 1:n){
-      pp_log_RS[i] ~ dnorm(mu_log_RS[i],tau)
-      mu_log_RS[i] <- lnalpha - betaW * Sw[i] - betaH * Sh[i] + b1 * ocean_surv[i] + b2 * basin[i]
+      
+      # mu_basin[basin_vec[i]] ~ dnorm(0, taua)
+      # mu_pop[pop_vec[i]] ~ dnorm(mu_basin[basin_vec[i]], taub_a)
+      
+      log_RS[i] ~ dnorm(mu_log_RS[i],tau)
+      mu_log_RS[i] <- lnalpha - beta * S[i] + b1 * basin[]
+      
+      # + mu_pop[pop_vec[i]]
       
       ###  do we analyse all pops in one model or develop separate models for each? one model for all seems preferable
       ###  do we need a covariate to capture the effects of dam passage?
@@ -15,7 +27,7 @@ cat('
       ###  AR(IMA) terms?
       
       alpha <- exp(lnalpha)
-
+      
       # # # res.law[i] <- sar.law[i] - mu.law[i]
       # # # sar.new[i] ~ dt(mu.law[i],tau.law,nu.law)
       # # # res.sar.new[i] <- sar.new[i] - mu.law[i]
@@ -36,8 +48,7 @@ cat('
     
     # Priors
     lnalpha ~ dunif(0,3) # prior for alpha truncated at 0: maximum number of recruits per spawner at low stock size OR slope of line at origin
-    betaW ~ dunif(0,10) # prior for beta: rate of decrease - normal distribution had trouble getting to small value of beta
-    betaH ~ dunif(0,10) # prior for beta: rate of decrease - normal distribution had trouble getting to small value of beta
+    beta ~ dunif(0,10) # prior for beta: rate of decrease - normal distribution had trouble getting to small value of beta
     b1 ~ dnorm(0, 1) # prior for effect of ocean survival
     tau ~ dgamma(0.01, 0.01) # prior error
     
@@ -55,22 +66,23 @@ cat('
   }', file={logRS_0.jags <- tempfile()})
 
 ## define parameters to monitor
-params.logRS_0 <- c(lnalpha, # log(alpha) term
+logRS_0.params <- c(lnalpha, # log(alpha) term
                     betaW, # beta for wild spawners
                     betaH, # beta for hatchery spawners
                     b1, # effect of ocean survival 
                     tau) # error term)
 
 ## call jags
-fit.logRS_0 <- jags(data = cbpSARequiv.lawDat,
-                    inits = inits.law,
-                    parameters.to.save = params.law,
-                    model.file = logRS_0.jags,
-                    n.chains = 3,
-                    n.iter = 250000,
-                    n.burnin = 25000,
-                    n.thin = 10,
-                    DIC = F)
+fit.logRS_0 <- jags.parallel(data = logRS_0.dat,
+                             parameters.to.save = logRS_0.params,
+                             model.file = logRS_0.jags,
+                             n.chains = 3,
+                             n.iter = 250000,
+                             n.burnin = 25000,
+                             n.thin = 10,
+                             n.cluster = 3,
+                             jags.seed = 123,
+                             DIC = F)
 
 ## extract log-likelihood and calculate waic score
 logRS_0.paramlist <- fit.logRS_0$BUGSoutput$sims.list
