@@ -2,6 +2,9 @@
 ## specify data
 logRS_0.dat<- list(log_RS=as.numeric(log(cb_upstr_dwnstr.dat$rs)),
                    S=cb_upstr_dwnstr.dat$tot_spnrs,
+                   cov1=cb_upstr_dwnstr.dat$cov1,  #placeholder
+                   cov2=cb_upstr_dwnstr.dat$cov2,  #placeholder
+                   cov3=cb_upstr_dwnstr.dat$cov3,  #placeholder
                    basin=cb_upstr_dwnstr.dat$basin_index,
                    nObs=length(cb_upstr_dwnstr.dat$rs),
                    nBasin=max(cb_upstr_dwnstr.dat$basin_index))
@@ -17,7 +20,7 @@ cat('
       # mu_pop[pop_vec[i]] ~ dnorm(mu_basin[basin_vec[i]], taub_a)
       
       log_RS[i,j] ~ dnorm(mu_log_RS[i,j],tau)
-      mu_log_RS[i,j] <- lnalpha[j] - beta * S[i,j]
+      mu_log_RS[i,j] <- lnalpha[j] - beta * S[i,j] + b1 * cov1[i,j] + b2 * cov2[i,j] + b3 * cov3[i,j]
       
       # + b1 * basin[]
       
@@ -51,12 +54,14 @@ cat('
     }
     }
     
-     alpha[j] <- exp(lnalpha)
+     alpha[j] <- exp(lnalpha) #back-transformed alpha
     
     # Priors
     lnalpha ~ dunif(0,3) # prior for alpha truncated at 0: maximum number of recruits per spawner at low stock size OR slope of line at origin
-    beta ~ dunif(0,10) # prior for beta: rate of decrease - normal distribution had trouble getting to small value of beta
-    b1 ~ dnorm(0, 1) # prior for effect of ocean survival
+    beta ~ dunif(0,10) # prior for beta
+    b1 ~ dnorm(0, 1) # prior for b1
+    b2 ~ dnorm(0, 1) # prior for b2
+    b3 ~ dnorm(0, 1) # prior for b3
     tau ~ dgamma(0.01, 0.01) # prior error
     
     # # derived values
@@ -73,11 +78,13 @@ cat('
   }', file={logRS_0.jags <- tempfile()})
 
 ## define parameters to monitor
-logRS_0.params <- c("lnalpha", # log(alpha) term
-                    "beta", # beta for wild spawners
-                    # "b1", # effect of ocean survival 
-                    "tau",
-                    "alpha") # error term)
+logRS_0.params <- c("lnalpha", #log(alpha) term
+                    "beta", #beta for wild spawners
+                    "b1", #effect of cov1
+                    "b2", #effect of cov2
+                    "b3", #effect of cov3
+                    "tau", #error term
+                    "alpha") #back-transformed alpha)
 
 ## call jags
 fit.logRS_0 <- jags.parallel(data = logRS_0.dat,
