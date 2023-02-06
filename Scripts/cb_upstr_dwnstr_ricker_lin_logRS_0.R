@@ -94,29 +94,41 @@ logRS_0.params <- c("lnalpha", #log(alpha) term
                     "alpha") #back-transformed alpha)
 
 ## call jags
-fit.logRS_0 <- jags.parallel(data = logRS_0.dat,
-                             parameters.to.save = logRS_0.params,
-                             model.file = logRS_0.jags,
-                             n.chains = 3,
-                             n.iter = 250000,
-                             n.burnin = 25000,
-                             n.thin = 10,
-                             n.cluster = 3,
-                             jags.seed = 123,
-                             DIC = F)
-
-## extract log-likelihood and calculate waic score
-logRS_0.paramlist <- fit.logRS_0$BUGSoutput$sims.list
-logRS_0.loglik <- logRS_0.paramlist$loglik
-logRS_0.waic <- waic(logRS_0.loglik)
+fit.logRS_0 <- jags(data = logRS_0.dat,
+                    parameters.to.save = logRS_0.params,
+                    model.file = logRS_0.jags,
+                    n.chains = 3,
+                    n.iter = 250000,
+                    n.burnin = 25000,
+                    n.thin = 10,
+                    # n.cluster = 3,
+                    jags.seed = 123,
+                    DIC = F)
 
 ## diagnostics
-### extract simulations
+### waic and p_waic
+#### generate samples
+samples.logRS_0 <- jags.samples(fit.logRS_0$model, 
+                           c("WAIC","deviance"), 
+                           type = "mean", 
+                           n.iter = 5000,
+                           n.burnin = 1000,
+                           n.thin = 1)
+
+#### extract samples and calculate metrics
+samples.logRS_0$p_waic <- samples.logRS_0$WAIC
+samples.logRS_0$waic <- samples.logRS_0$deviance + samples.logRS_0$p_waic
+tmp <- sapply(samples.logRS_0, sum)
+waic.logRS_0 <- round(c(waic = tmp[["waic"]], p_waic = tmp[["p_waic"]]),1)
+
+### trace and density plots
+#### extract simulations for plotting
 logRS_0.mcmc <- as.mcmc(fit.logRS_0)
 logRS_0.ggs.dat <- ggs(logRS_0.mcmc)
 
-### trace plots
-#### log(alpha)
+#### plots
+##### trace
+###### log(alpha)
 logRS_0_lnalpha.trPlot <- ggs_traceplot(logRS_0.ggs.dat, family = "lnalpha")+
   theme_bw()+
   theme(panel.border = element_blank(),
