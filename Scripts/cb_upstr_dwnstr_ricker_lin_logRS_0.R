@@ -21,13 +21,13 @@ cat('
   
     # Likelihood
     for (i in 1:nObs){
-    for (j in nBasin){
+    # for (j in nBasin){
       
       # mu_basin[basin_vec[i]] ~ dnorm(0, taua)
       # mu_pop[pop_vec[i]] ~ dnorm(mu_basin[basin_vec[i]], taub_a)
       
-      log_RS[i,j] ~ dnorm(mu_log_RS[i,j],tau)
-      mu_log_RS[i,j] <- lnalpha[j] - beta * S[i,j] + b1 * cov1[i,j] + b2 * cov2[i,j] + b3 * cov3[i,j]
+      log_RS[i] ~ dnorm(mu_log_RS[i],tau)
+      mu_log_RS[i] <- lnalpha[] - beta * S[i] + b1 * cov1[i] + b2 * cov2[i] + b3 * cov3[i]
       
       # + b1 * basin[]
       
@@ -59,9 +59,9 @@ cat('
       # # discrepancy/squared residuals for new/ideal data
       # law.SqResid.new[i]<-pow(sar.new[i]-law.pred[i],2)
     }
-    }
+    # }
     
-     alpha[j] <- exp(lnalpha) #back-transformed alpha
+     alpha <- exp(lnalpha) #back-transformed alpha
     
     # Priors
     lnalpha ~ dunif(0,3) # prior for alpha truncated at 0: maximum number of recruits per spawner at low stock size OR slope of line at origin
