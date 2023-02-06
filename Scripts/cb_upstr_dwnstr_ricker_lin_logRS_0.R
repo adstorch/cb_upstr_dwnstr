@@ -1,13 +1,13 @@
-# model 1: global model ---------------------------------------------------
+# model 0: global model (non-hierarchical) --------------------------------
 ## specify data
-logRS_0.dat<- list(log_RS=as.numeric(log(cb_upstr_dwnstr.dat$rs)),
-                   S=cb_upstr_dwnstr.dat$tot_spnrs,
-                   cov1=cb_upstr_dwnstr.dat$cov1,  #placeholder
-                   cov2=cb_upstr_dwnstr.dat$cov2,  #placeholder
-                   cov3=cb_upstr_dwnstr.dat$cov3,  #placeholder
-                   basin=cb_upstr_dwnstr.dat$basin_index,
-                   nObs=length(cb_upstr_dwnstr.dat$rs),
-                   nBasin=max(cb_upstr_dwnstr.dat$basin_index))
+mod0.dat<- list(log_RS=as.numeric(log(cb_upstr_dwnstr.dat$rs)),
+                S=cb_upstr_dwnstr.dat$tot_spnrs,
+                cov1=cb_upstr_dwnstr.dat$cov1,  #placeholder
+                cov2=cb_upstr_dwnstr.dat$cov2,  #placeholder
+                cov3=cb_upstr_dwnstr.dat$cov3,  #placeholder
+                basin=cb_upstr_dwnstr.dat$basin_index,
+                nObs=length(cb_upstr_dwnstr.dat$rs),
+                nBasin=max(cb_upstr_dwnstr.dat$basin_index))
 
 ## specify model
 cat('
@@ -82,54 +82,54 @@ cat('
     # law.bpval<-mean(law.test)
     
     
-  }', file={logRS_0.jags <- tempfile()})
+  }', file={mod0.jags <- tempfile()})
 
 ## define parameters to monitor
-logRS_0.params <- c("lnalpha", #log(alpha) term
-                    "beta", #beta for wild spawners
-                    "b1", #effect of cov1
-                    "b2", #effect of cov2
-                    "b3", #effect of cov3
-                    "tau", #error term
-                    "alpha") #back-transformed alpha)
+mod0.params <- c("lnalpha", #log(alpha) term
+                 "beta", #beta for wild spawners
+                 "b1", #effect of cov1
+                 "b2", #effect of cov2
+                 "b3", #effect of cov3
+                 "tau",
+                 "alpha") #error term
 
 ## call jags
-fit.logRS_0 <- jags(data = logRS_0.dat,
-                    parameters.to.save = logRS_0.params,
-                    model.file = logRS_0.jags,
-                    n.chains = 3,
-                    n.iter = 250000,
-                    n.burnin = 25000,
-                    n.thin = 10,
-                    # n.cluster = 3,
-                    jags.seed = 123,
-                    DIC = F)
+fit.mod0 <- jags(data = mod0.dat,
+                 parameters.to.save = mod0.params,
+                 model.file = mod0.jags,
+                 n.chains = 3,
+                 n.iter = 250000,
+                 n.burnin = 25000,
+                 n.thin = 10,
+                 # n.cluster = 3,
+                 jags.seed = 123,
+                 DIC = F)
 
 ## diagnostics
 ### waic and p_waic
 #### generate samples
-samples.logRS_0 <- jags.samples(fit.logRS_0$model, 
-                           c("WAIC","deviance"), 
-                           type = "mean", 
-                           n.iter = 5000,
-                           n.burnin = 1000,
-                           n.thin = 1)
+samples.mod0 <- jags.samples(fit.mod0$model, 
+                             c("WAIC","deviance"), 
+                             type = "mean", 
+                             n.iter = 5000,
+                             n.burnin = 1000,
+                             n.thin = 1)
 
 #### extract samples and calculate metrics
-samples.logRS_0$p_waic <- samples.logRS_0$WAIC
-samples.logRS_0$waic <- samples.logRS_0$deviance + samples.logRS_0$p_waic
-tmp <- sapply(samples.logRS_0, sum)
-waic.logRS_0 <- round(c(waic = tmp[["waic"]], p_waic = tmp[["p_waic"]]),1)
+samples.mod0$p_waic <- samples.mod0$WAIC
+samples.mod0$waic <- samples.mod0$deviance + samples.mod0$p_waic
+tmp <- sapply(samples.mod0, sum)
+waic.mod0 <- round(c(waic = tmp[["waic"]], p_waic = tmp[["p_waic"]]),1)
 
 ### trace and density plots
 #### extract simulations for plotting
-logRS_0.mcmc <- as.mcmc(fit.logRS_0)
-logRS_0.ggs.dat <- ggs(logRS_0.mcmc)
+mod0.mcmc <- as.mcmc(fit.mod0)
+mod0.ggs.dat <- ggs(mod0.mcmc)
 
-#### plots
+#### plots (these will have to be manipulated based on covariates selected)
 ##### trace
 ###### log(alpha)
-logRS_0_lnalpha.trPlot <- ggs_traceplot(logRS_0.ggs.dat, family = "lnalpha")+
+mod0_lnalpha.trPlot <- ggs_traceplot(mod0.ggs.dat, family = "lnalpha")+
   theme_bw()+
   theme(panel.border = element_blank(),
         panel.grid.major = element_blank(),
@@ -148,10 +148,267 @@ logRS_0_lnalpha.trPlot <- ggs_traceplot(logRS_0.ggs.dat, family = "lnalpha")+
         axis.ticks.length = unit(0.15, "cm"))+
   labs(title = "log(alpha)",y = "Value", x = "Iteration") +
   annotate(geom = "text",
-           x = post_dim(logRS_0.mcmc,"saved")/post_dim(logRS_0.mcmc,"chains"),
-           y = max(MCMCchains(logRS_0.mcmc, params = 'lnalpha')),
-           label = paste("hat(R)","~`=`~",round(as.numeric(fit.logRS_0$BUGSoutput$summary[1,8]),3),sep=""),
-           hjust = 1.0,vjust=0.0,size = 5.1,family = "Calibri",parse = TRUE)+ # Rhat has to be Changed based on jags output (extraction rounds to nearest interger)
+           x = post_dim(mod0.mcmc,"saved")/post_dim(mod0.mcmc,"chains"),
+           y = max(MCMCchains(mod0.mcmc, params = 'lnalpha')),
+           label = paste("hat(R)","~`=`~",round(as.numeric(fit.mod0$BUGSoutput$summary[6,8]),3),sep=""),
+           hjust = 1.0,vjust=0.0,size = 5.1,family = "Calibri",parse = TRUE)+
+  theme(plot.title = element_text(hjust = 0.5,size = 16,face = "bold",family = "Calibri"))
+
+###### beta
+mod0_beta.trPlot <- ggs_traceplot(mod0.ggs.dat, family = "beta")+
+  theme_bw()+
+  theme(panel.border = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(color = "black"),
+        axis.title.y = element_text(face = "bold", size = 16,vjust = 1,margin = margin(t = 0, r = 50, b = 0, l = 0),family = "Calibri"),
+        axis.title.x = element_text(face = "bold", size = 16,vjust = -1,margin = margin(t = 10, r = 0, b = 0, l = 0),family = "Calibri"),
+        axis.text.x = element_text(face = "bold",size = 14,color="black", vjust=0.5,family = "Calibri"),
+        axis.text.y = element_text(face = "bold",size = 14,color="black",family = "Calibri"),
+        strip.background = element_blank(),
+        legend.position = "none",
+        strip.text.x = element_blank(),
+        legend.title = element_text(face = "bold",size = 12,color="black",family = "Calibri"),
+        plot.margin = margin(0.5, 1, 0.5, 0.5, "cm"),
+        legend.text=element_text(face = "bold",size = 12,color="black",family = "Calibri"),
+        axis.ticks.length = unit(0.15, "cm"))+
+  labs(title = "beta",y = "Value", x = "Iteration") +
+  annotate(geom = "text",
+           x = post_dim(mod0.mcmc,"saved")/post_dim(mod0.mcmc,"chains"),
+           y = max(MCMCchains(mod0.mcmc, params = 'beta')),
+           label = paste("hat(R)","~`=`~",round(as.numeric(fit.mod0$BUGSoutput$summary[5,8]),3),sep=""),
+           hjust = 1.0,vjust=0.0,size = 5.1,family = "Calibri",parse = TRUE)+
+  theme(plot.title = element_text(hjust = 0.5,size = 16,face = "bold",family = "Calibri"))
+
+###### b1
+mod0_b1.trPlot <- ggs_traceplot(mod0.ggs.dat, family = "b1")+
+  theme_bw()+
+  theme(panel.border = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(color = "black"),
+        axis.title.y = element_text(face = "bold", size = 16,vjust = 1,margin = margin(t = 0, r = 50, b = 0, l = 0),family = "Calibri"),
+        axis.title.x = element_text(face = "bold", size = 16,vjust = -1,margin = margin(t = 10, r = 0, b = 0, l = 0),family = "Calibri"),
+        axis.text.x = element_text(face = "bold",size = 14,color="black", vjust=0.5,family = "Calibri"),
+        axis.text.y = element_text(face = "bold",size = 14,color="black",family = "Calibri"),
+        strip.background = element_blank(),
+        legend.position = "none",
+        strip.text.x = element_blank(),
+        legend.title = element_text(face = "bold",size = 12,color="black",family = "Calibri"),
+        plot.margin = margin(0.5, 1, 0.5, 0.5, "cm"),
+        legend.text=element_text(face = "bold",size = 12,color="black",family = "Calibri"),
+        axis.ticks.length = unit(0.15, "cm"))+
+  labs(title = "b1",y = "Value", x = "Iteration") +
+  annotate(geom = "text",
+           x = post_dim(mod0.mcmc,"saved")/post_dim(mod0.mcmc,"chains"),
+           y = max(MCMCchains(mod0.mcmc, params = 'b1')),
+           label = paste("hat(R)","~`=`~",round(as.numeric(fit.mod0$BUGSoutput$summary[2,8]),3),sep=""),
+           hjust = 1.0,vjust=0.0,size = 5.1,family = "Calibri",parse = TRUE)+
+  theme(plot.title = element_text(hjust = 0.5,size = 16,face = "bold",family = "Calibri"))
+
+###### b2
+mod0_b2.trPlot <- ggs_traceplot(mod0.ggs.dat, family = "b2")+
+  theme_bw()+
+  theme(panel.border = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(color = "black"),
+        axis.title.y = element_text(face = "bold", size = 16,vjust = 1,margin = margin(t = 0, r = 50, b = 0, l = 0),family = "Calibri"),
+        axis.title.x = element_text(face = "bold", size = 16,vjust = -1,margin = margin(t = 10, r = 0, b = 0, l = 0),family = "Calibri"),
+        axis.text.x = element_text(face = "bold",size = 14,color="black", vjust=0.5,family = "Calibri"),
+        axis.text.y = element_text(face = "bold",size = 14,color="black",family = "Calibri"),
+        strip.background = element_blank(),
+        legend.position = "none",
+        strip.text.x = element_blank(),
+        legend.title = element_text(face = "bold",size = 12,color="black",family = "Calibri"),
+        plot.margin = margin(0.5, 1, 0.5, 0.5, "cm"),
+        legend.text=element_text(face = "bold",size = 12,color="black",family = "Calibri"),
+        axis.ticks.length = unit(0.15, "cm"))+
+  labs(title = "b2",y = "Value", x = "Iteration") +
+  annotate(geom = "text",
+           x = post_dim(mod0.mcmc,"saved")/post_dim(mod0.mcmc,"chains"),
+           y = max(MCMCchains(mod0.mcmc, params = 'b2')),
+           label = paste("hat(R)","~`=`~",round(as.numeric(fit.mod0$BUGSoutput$summary[3,8]),3),sep=""),
+           hjust = 1.0,vjust=0.0,size = 5.1,family = "Calibri",parse = TRUE)+
+  theme(plot.title = element_text(hjust = 0.5,size = 16,face = "bold",family = "Calibri"))
+
+###### b3
+mod0_b3.trPlot <- ggs_traceplot(mod0.ggs.dat, family = "b3")+
+  theme_bw()+
+  theme(panel.border = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(color = "black"),
+        axis.title.y = element_text(face = "bold", size = 16,vjust = 1,margin = margin(t = 0, r = 50, b = 0, l = 0),family = "Calibri"),
+        axis.title.x = element_text(face = "bold", size = 16,vjust = -1,margin = margin(t = 10, r = 0, b = 0, l = 0),family = "Calibri"),
+        axis.text.x = element_text(face = "bold",size = 14,color="black", vjust=0.5,family = "Calibri"),
+        axis.text.y = element_text(face = "bold",size = 14,color="black",family = "Calibri"),
+        strip.background = element_blank(),
+        legend.position = "none",
+        strip.text.x = element_blank(),
+        legend.title = element_text(face = "bold",size = 12,color="black",family = "Calibri"),
+        plot.margin = margin(0.5, 1, 0.5, 0.5, "cm"),
+        legend.text=element_text(face = "bold",size = 12,color="black",family = "Calibri"),
+        axis.ticks.length = unit(0.15, "cm"))+
+  labs(title = "b3",y = "Value", x = "Iteration") +
+  annotate(geom = "text",
+           x = post_dim(mod0.mcmc,"saved")/post_dim(mod0.mcmc,"chains"),
+           y = max(MCMCchains(mod0.mcmc, params = 'b3')),
+           label = paste("hat(R)","~`=`~",round(as.numeric(fit.mod0$BUGSoutput$summary[4,8]),3),sep=""),
+           hjust = 1.0,vjust=0.0,size = 5.1,family = "Calibri",parse = TRUE)+
+  theme(plot.title = element_text(hjust = 0.5,size = 16,face = "bold",family = "Calibri"))
+
+###### tau
+mod0_tau.trPlot <- ggs_traceplot(mod0.ggs.dat, family = "tau")+
+  theme_bw()+
+  theme(panel.border = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(color = "black"),
+        axis.title.y = element_text(face = "bold", size = 16,vjust = 1,margin = margin(t = 0, r = 50, b = 0, l = 0),family = "Calibri"),
+        axis.title.x = element_text(face = "bold", size = 16,vjust = -1,margin = margin(t = 10, r = 0, b = 0, l = 0),family = "Calibri"),
+        axis.text.x = element_text(face = "bold",size = 14,color="black", vjust=0.5,family = "Calibri"),
+        axis.text.y = element_text(face = "bold",size = 14,color="black",family = "Calibri"),
+        strip.background = element_blank(),
+        legend.position = "none",
+        strip.text.x = element_blank(),
+        legend.title = element_text(face = "bold",size = 12,color="black",family = "Calibri"),
+        plot.margin = margin(0.5, 1, 0.5, 0.5, "cm"),
+        legend.text=element_text(face = "bold",size = 12,color="black",family = "Calibri"),
+        axis.ticks.length = unit(0.15, "cm"))+
+  labs(title = "tau",y = "Value", x = "Iteration") +
+  annotate(geom = "text",
+           x = post_dim(mod0.mcmc,"saved")/post_dim(mod0.mcmc,"chains"),
+           y = max(MCMCchains(mod0.mcmc, params = 'tau')),
+           label = paste("hat(R)","~`=`~",round(as.numeric(fit.mod0$BUGSoutput$summary[7,8]),3),sep=""),
+           hjust = 1.0,vjust=0.0,size = 5.1,family = "Calibri",parse = TRUE)+
+  theme(plot.title = element_text(hjust = 0.5,size = 16,face = "bold",family = "Calibri"))
+
+##### density
+###### log(alpha)
+mod0_lnalpha.densPlot <- ggs_density(mod0.ggs.dat, family = "lnalpha")+
+  theme_bw()+
+  theme(panel.border = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(color = "black"),
+        axis.title.y = element_text(face = "bold", size = 16,vjust = 1,margin = margin(t = 0, r = 50, b = 0, l = 0),family = "Calibri"),
+        axis.title.x = element_text(face = "bold", size = 16,vjust = -1,margin = margin(t = 10, r = 0, b = 0, l = 0),family = "Calibri"),
+        axis.text.x = element_text(face = "bold",size = 14,color="black", vjust=0.5,family = "Calibri"),
+        axis.text.y = element_text(face = "bold",size = 14,color="black",family = "Calibri"),
+        strip.background = element_blank(),
+        legend.position = "none",
+        strip.text.x = element_blank(),
+        legend.title = element_text(face = "bold",size = 12,color="black",family = "Calibri"),
+        plot.margin = margin(0.5, 1, 0.5, 0.5, "cm"),
+        legend.text=element_text(face = "bold",size = 12,color="black",family = "Calibri"),
+        axis.ticks.length = unit(0.15, "cm"))+
+  labs(title = "log(alpha)",y = "Density", x = "Value") +
+  theme(plot.title = element_text(hjust = 0.5,size = 16,face = "bold",family = "Calibri"))
+
+###### beta
+mod0_beta.densPlot <- ggs_density(mod0.ggs.dat, family = "beta")+
+  theme_bw()+
+  theme(panel.border = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(color = "black"),
+        axis.title.y = element_text(face = "bold", size = 16,vjust = 1,margin = margin(t = 0, r = 50, b = 0, l = 0),family = "Calibri"),
+        axis.title.x = element_text(face = "bold", size = 16,vjust = -1,margin = margin(t = 10, r = 0, b = 0, l = 0),family = "Calibri"),
+        axis.text.x = element_text(face = "bold",size = 14,color="black", vjust=0.5,family = "Calibri"),
+        axis.text.y = element_text(face = "bold",size = 14,color="black",family = "Calibri"),
+        strip.background = element_blank(),
+        legend.position = "none",
+        strip.text.x = element_blank(),
+        legend.title = element_text(face = "bold",size = 12,color="black",family = "Calibri"),
+        plot.margin = margin(0.5, 1, 0.5, 0.5, "cm"),
+        legend.text=element_text(face = "bold",size = 12,color="black",family = "Calibri"),
+        axis.ticks.length = unit(0.15, "cm"))+
+  labs(title = "beta",y = "Density", x = "Value") +
+  theme(plot.title = element_text(hjust = 0.5,size = 16,face = "bold",family = "Calibri"))
+
+###### b1
+mod0_b1.densPlot <- ggs_density(mod0.ggs.dat, family = "b1")+
+  theme_bw()+
+  theme(panel.border = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(color = "black"),
+        axis.title.y = element_text(face = "bold", size = 16,vjust = 1,margin = margin(t = 0, r = 50, b = 0, l = 0),family = "Calibri"),
+        axis.title.x = element_text(face = "bold", size = 16,vjust = -1,margin = margin(t = 10, r = 0, b = 0, l = 0),family = "Calibri"),
+        axis.text.x = element_text(face = "bold",size = 14,color="black", vjust=0.5,family = "Calibri"),
+        axis.text.y = element_text(face = "bold",size = 14,color="black",family = "Calibri"),
+        strip.background = element_blank(),
+        legend.position = "none",
+        strip.text.x = element_blank(),
+        legend.title = element_text(face = "bold",size = 12,color="black",family = "Calibri"),
+        plot.margin = margin(0.5, 1, 0.5, 0.5, "cm"),
+        legend.text=element_text(face = "bold",size = 12,color="black",family = "Calibri"),
+        axis.ticks.length = unit(0.15, "cm"))+
+  labs(title = "b1",y = "Density", x = "Value") +
+  theme(plot.title = element_text(hjust = 0.5,size = 16,face = "bold",family = "Calibri"))
+
+###### b2
+mod0_b2.densPlot <- ggs_density(mod0.ggs.dat, family = "b2")+
+  theme_bw()+
+  theme(panel.border = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(color = "black"),
+        axis.title.y = element_text(face = "bold", size = 16,vjust = 1,margin = margin(t = 0, r = 50, b = 0, l = 0),family = "Calibri"),
+        axis.title.x = element_text(face = "bold", size = 16,vjust = -1,margin = margin(t = 10, r = 0, b = 0, l = 0),family = "Calibri"),
+        axis.text.x = element_text(face = "bold",size = 14,color="black", vjust=0.5,family = "Calibri"),
+        axis.text.y = element_text(face = "bold",size = 14,color="black",family = "Calibri"),
+        strip.background = element_blank(),
+        legend.position = "none",
+        strip.text.x = element_blank(),
+        legend.title = element_text(face = "bold",size = 12,color="black",family = "Calibri"),
+        plot.margin = margin(0.5, 1, 0.5, 0.5, "cm"),
+        legend.text=element_text(face = "bold",size = 12,color="black",family = "Calibri"),
+        axis.ticks.length = unit(0.15, "cm"))+
+  labs(title = "b2",y = "Density", x = "Value") +
+  theme(plot.title = element_text(hjust = 0.5,size = 16,face = "bold",family = "Calibri"))
+
+###### b3
+mod0_b3.densPlot <- ggs_density(mod0.ggs.dat, family = "b3")+
+  theme_bw()+
+  theme(panel.border = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(color = "black"),
+        axis.title.y = element_text(face = "bold", size = 16,vjust = 1,margin = margin(t = 0, r = 50, b = 0, l = 0),family = "Calibri"),
+        axis.title.x = element_text(face = "bold", size = 16,vjust = -1,margin = margin(t = 10, r = 0, b = 0, l = 0),family = "Calibri"),
+        axis.text.x = element_text(face = "bold",size = 14,color="black", vjust=0.5,family = "Calibri"),
+        axis.text.y = element_text(face = "bold",size = 14,color="black",family = "Calibri"),
+        strip.background = element_blank(),
+        legend.position = "none",
+        strip.text.x = element_blank(),
+        legend.title = element_text(face = "bold",size = 12,color="black",family = "Calibri"),
+        plot.margin = margin(0.5, 1, 0.5, 0.5, "cm"),
+        legend.text=element_text(face = "bold",size = 12,color="black",family = "Calibri"),
+        axis.ticks.length = unit(0.15, "cm"))+
+  labs(title = "b3",y = "Density", x = "Value") +
+  theme(plot.title = element_text(hjust = 0.5,size = 16,face = "bold",family = "Calibri"))
+
+###### tau
+mod0_tau.densPlot <- ggs_density(mod0.ggs.dat, family = "tau")+
+  theme_bw()+
+  theme(panel.border = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(color = "black"),
+        axis.title.y = element_text(face = "bold", size = 16,vjust = 1,margin = margin(t = 0, r = 50, b = 0, l = 0),family = "Calibri"),
+        axis.title.x = element_text(face = "bold", size = 16,vjust = -1,margin = margin(t = 10, r = 0, b = 0, l = 0),family = "Calibri"),
+        axis.text.x = element_text(face = "bold",size = 14,color="black", vjust=0.5,family = "Calibri"),
+        axis.text.y = element_text(face = "bold",size = 14,color="black",family = "Calibri"),
+        strip.background = element_blank(),
+        legend.position = "none",
+        strip.text.x = element_blank(),
+        legend.title = element_text(face = "bold",size = 12,color="black",family = "Calibri"),
+        plot.margin = margin(0.5, 1, 0.5, 0.5, "cm"),
+        legend.text=element_text(face = "bold",size = 12,color="black",family = "Calibri"),
+        axis.ticks.length = unit(0.15, "cm"))+
+  labs(title = "tau",y = "Density", x = "Value") +
   theme(plot.title = element_text(hjust = 0.5,size = 16,face = "bold",family = "Calibri"))
 
 ### combined plots
