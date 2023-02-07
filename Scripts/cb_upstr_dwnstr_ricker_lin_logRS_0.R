@@ -27,7 +27,7 @@ cat('
       # mu_pop[pop_vec[i]] ~ dnorm(mu_basin[basin_vec[i]], taub_a)
       
       log_RS[i] ~ dnorm(mu_log_RS[i],tau)
-      mu_log_RS[i] <- lnalpha[] - beta * S[i] + b1 * cov1[i] + b2 * cov2[i] + b3 * cov3[i]
+      mu_log_RS[i] <- lnalpha - beta * S[i] + b1 * cov1[i] + b2 * cov2[i] + b3 * cov3[i]
       
       # + b1 * basin[]
       
@@ -127,8 +127,9 @@ mod0.mcmc <- as.mcmc(fit.mod0)
 mod0.ggs.dat <- ggs(mod0.mcmc)
 
 #### plots (these will have to be manipulated based on covariates selected)
-##### trace
-###### log(alpha)
+##### MCMC
+###### trace
+####### log(alpha)
 mod0_lnalpha.trPlot <- ggs_traceplot(mod0.ggs.dat, family = "lnalpha")+
   theme_bw()+
   theme(panel.border = element_blank(),
@@ -154,7 +155,7 @@ mod0_lnalpha.trPlot <- ggs_traceplot(mod0.ggs.dat, family = "lnalpha")+
            hjust = 1.0,vjust=0.0,size = 5.1,family = "serif",parse = TRUE)+
   theme(plot.title = element_text(hjust = 0.5,size = 16,face = "bold",family = "serif"))
 
-###### beta
+####### beta
 mod0_beta.trPlot <- ggs_traceplot(mod0.ggs.dat, family = "beta")+
   theme_bw()+
   theme(panel.border = element_blank(),
@@ -180,7 +181,7 @@ mod0_beta.trPlot <- ggs_traceplot(mod0.ggs.dat, family = "beta")+
            hjust = 1.0,vjust=0.0,size = 5.1,family = "serif",parse = TRUE)+
   theme(plot.title = element_text(hjust = 0.5,size = 16,face = "bold",family = "serif"))
 
-###### b1
+####### b1
 mod0_b1.trPlot <- ggs_traceplot(mod0.ggs.dat, family = "b1")+
   theme_bw()+
   theme(panel.border = element_blank(),
@@ -206,7 +207,7 @@ mod0_b1.trPlot <- ggs_traceplot(mod0.ggs.dat, family = "b1")+
            hjust = 1.0,vjust=0.0,size = 5.1,family = "serif",parse = TRUE)+
   theme(plot.title = element_text(hjust = 0.5,size = 16,face = "bold",family = "serif"))
 
-###### b2
+####### b2
 mod0_b2.trPlot <- ggs_traceplot(mod0.ggs.dat, family = "b2")+
   theme_bw()+
   theme(panel.border = element_blank(),
@@ -232,7 +233,7 @@ mod0_b2.trPlot <- ggs_traceplot(mod0.ggs.dat, family = "b2")+
            hjust = 1.0,vjust=0.0,size = 5.1,family = "serif",parse = TRUE)+
   theme(plot.title = element_text(hjust = 0.5,size = 16,face = "bold",family = "serif"))
 
-###### b3
+####### b3
 mod0_b3.trPlot <- ggs_traceplot(mod0.ggs.dat, family = "b3")+
   theme_bw()+
   theme(panel.border = element_blank(),
@@ -258,7 +259,7 @@ mod0_b3.trPlot <- ggs_traceplot(mod0.ggs.dat, family = "b3")+
            hjust = 1.0,vjust=0.0,size = 5.1,family = "serif",parse = TRUE)+
   theme(plot.title = element_text(hjust = 0.5,size = 16,face = "bold",family = "serif"))
 
-###### tau
+####### tau
 mod0_tau.trPlot <- ggs_traceplot(mod0.ggs.dat, family = "tau")+
   theme_bw()+
   theme(panel.border = element_blank(),
@@ -284,8 +285,8 @@ mod0_tau.trPlot <- ggs_traceplot(mod0.ggs.dat, family = "tau")+
            hjust = 1.0,vjust=0.0,size = 5.1,family = "serif",parse = TRUE)+
   theme(plot.title = element_text(hjust = 0.5,size = 16,face = "bold",family = "serif"))
 
-##### density
-###### log(alpha)
+###### density
+####### log(alpha)
 mod0_lnalpha.densPlot <- ggs_density(mod0.ggs.dat, family = "lnalpha")+
   theme_bw()+
   theme(panel.border = element_blank(),
@@ -306,7 +307,7 @@ mod0_lnalpha.densPlot <- ggs_density(mod0.ggs.dat, family = "lnalpha")+
   labs(title = "",y = "Density", x = "Value") +
   theme(plot.title = element_text(hjust = 0.5,size = 16,face = "bold",family = "serif"))
 
-###### beta
+####### beta
 mod0_beta.densPlot <- ggs_density(mod0.ggs.dat, family = "beta")+
   theme_bw()+
   theme(panel.border = element_blank(),
@@ -327,7 +328,7 @@ mod0_beta.densPlot <- ggs_density(mod0.ggs.dat, family = "beta")+
   labs(title = "beta",y = "Density", x = "Value") +
   theme(plot.title = element_text(hjust = 0.5,size = 16,face = "bold",family = "serif"))
 
-###### b1
+####### b1
 mod0_b1.densPlot <- ggs_density(mod0.ggs.dat, family = "b1")+
   theme_bw()+
   theme(panel.border = element_blank(),
@@ -348,7 +349,7 @@ mod0_b1.densPlot <- ggs_density(mod0.ggs.dat, family = "b1")+
   labs(title = "",y = "Density", x = "Value") +
   theme(plot.title = element_text(hjust = 0.5,size = 16,face = "bold",family = "serif"))
 
-###### b2
+####### b2
 mod0_b2.densPlot <- ggs_density(mod0.ggs.dat, family = "b2")+
   theme_bw()+
   theme(panel.border = element_blank(),
@@ -369,7 +370,7 @@ mod0_b2.densPlot <- ggs_density(mod0.ggs.dat, family = "b2")+
   labs(title = "",y = "Density", x = "Value") +
   theme(plot.title = element_text(hjust = 0.5,size = 16,face = "bold",family = "serif"))
 
-###### b3
+####### b3
 mod0_b3.densPlot <- ggs_density(mod0.ggs.dat, family = "b3")+
   theme_bw()+
   theme(panel.border = element_blank(),
@@ -390,7 +391,7 @@ mod0_b3.densPlot <- ggs_density(mod0.ggs.dat, family = "b3")+
   labs(title = "b3",y = "Density", x = "Value") +
   theme(plot.title = element_text(hjust = 0.5,size = 16,face = "bold",family = "serif"))
 
-###### tau
+####### tau
 mod0_tau.densPlot <- ggs_density(mod0.ggs.dat, family = "tau")+
   theme_bw()+
   theme(panel.border = element_blank(),
@@ -411,8 +412,8 @@ mod0_tau.densPlot <- ggs_density(mod0.ggs.dat, family = "tau")+
   labs(title = "",y = "Density", x = "Value") +
   theme(plot.title = element_text(hjust = 0.5,size = 16,face = "bold",family = "serif"))
 
-##### combined plots
-###### log(alpha)
+###### combined plots
+####### log(alpha)
 mod0_lnalpha.combPlot<-ggarrange(mod0_lnalpha.trPlot,
                                  mod0_lnalpha.densPlot,
                                  ncol = 1,
@@ -428,7 +429,7 @@ png(paste("Output\\Figures\\Diagnostic\\MCMC\\mod0\\mod0_lnalpha.comb_tr_dens_pl
 print(mod0_lnalpha.combPlot)
 dev.off()
 
-###### beta
+####### beta
 mod0_beta.combPlot<-ggarrange(mod0_beta.trPlot,
                               mod0_beta.densPlot,
                               ncol = 1,
@@ -444,7 +445,7 @@ png(paste("Output\\Figures\\Diagnostic\\MCMC\\mod0\\mod0_beta.comb_tr_dens_plot"
 print(mod0_beta.combPlot)
 dev.off()
 
-###### b1
+####### b1
 mod0_b1.combPlot<-ggarrange(mod0_b1.trPlot,
                             mod0_b1.densPlot,
                             ncol = 1,
@@ -460,7 +461,7 @@ png(paste("Output\\Figures\\Diagnostic\\MCMC\\mod0\\mod0_b1.comb_tr_dens_plot","
 print(mod0_b1.combPlot)
 dev.off()
 
-###### b2
+####### b2
 mod0_b2.combPlot<-ggarrange(mod0_b2.trPlot,
                             mod0_b2.densPlot,
                             ncol = 1,
@@ -476,7 +477,7 @@ png(paste("Output\\Figures\\Diagnostic\\MCMC\\mod0\\mod0_b2.comb_tr_dens_plot","
 print(mod0_b2.combPlot)
 dev.off()
 
-###### b3
+####### b3
 mod0_b3.combPlot<-ggarrange(mod0_b3.trPlot,
                             mod0_b3.densPlot,
                             ncol = 1,
@@ -492,7 +493,7 @@ png(paste("Output\\Figures\\Diagnostic\\MCMC\\mod0\\mod0_b3.comb_tr_dens_plot","
 print(mod0_b3.combPlot)
 dev.off()
 
-###### tau
+####### tau
 mod0_tau.combPlot<-ggarrange(mod0_tau.trPlot,
                              mod0_tau.densPlot,
                              ncol = 1,
