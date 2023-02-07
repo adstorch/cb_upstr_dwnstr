@@ -5,9 +5,9 @@ mod0.dat<- list(log_RS=as.numeric(log(cb_upstr_dwnstr.dat$rs)),
                 cov1=cb_upstr_dwnstr.dat$cov1,  #placeholder
                 cov2=cb_upstr_dwnstr.dat$cov2,  #placeholder
                 cov3=cb_upstr_dwnstr.dat$cov3,  #placeholder
-                basin=cb_upstr_dwnstr.dat$basin_index,
-                nObs=length(cb_upstr_dwnstr.dat$rs),
-                nBasin=max(cb_upstr_dwnstr.dat$basin_index))
+                # basin=cb_upstr_dwnstr.dat$basin_index,
+                nObs=length(cb_upstr_dwnstr.dat$rs))
+                # nBasin=max(cb_upstr_dwnstr.dat$basin_index))
 
 ## specify model
 cat('
@@ -86,12 +86,12 @@ cat('
 
 ## define parameters to monitor
 mod0.params <- c("lnalpha", #log(alpha) term
-                 "beta", #beta for wild spawners
+                 "beta", #beta for spawners
                  "b1", #effect of cov1
                  "b2", #effect of cov2
                  "b3", #effect of cov3
-                 "tau",
-                 "alpha") #error term
+                 "tau", #error term
+                 "alpha") #back-transformed alpha
 
 ## call jags
 fit.mod0 <- jags(data = mod0.dat,
@@ -111,8 +111,8 @@ fit.mod0 <- jags(data = mod0.dat,
 samples.mod0 <- jags.samples(fit.mod0$model, 
                              c("WAIC","deviance"), 
                              type = "mean", 
-                             n.iter = 5000,
-                             n.burnin = 1000,
+                             n.iter = 50000,
+                             n.burnin = 5000,
                              n.thin = 1)
 
 #### extract samples and calculate metrics
@@ -135,24 +135,24 @@ mod0_lnalpha.trPlot <- ggs_traceplot(mod0.ggs.dat, family = "lnalpha")+
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         axis.line = element_line(color = "black"),
-        axis.title.y = element_text(face = "bold", size = 16,vjust = 1,margin = margin(t = 0, r = 50, b = 0, l = 0),family = "Calibri"),
-        axis.title.x = element_text(face = "bold", size = 16,vjust = -1,margin = margin(t = 10, r = 0, b = 0, l = 0),family = "Calibri"),
-        axis.text.x = element_text(face = "bold",size = 14,color="black", vjust=0.5,family = "Calibri"),
-        axis.text.y = element_text(face = "bold",size = 14,color="black",family = "Calibri"),
+        axis.title.y = element_text(face = "bold", size = 16,vjust = 1,margin = margin(t = 0, r = 50, b = 0, l = 0),family = "serif"),
+        axis.title.x = element_text(face = "bold", size = 16,vjust = -1,margin = margin(t = 10, r = 0, b = 0, l = 0),family = "serif"),
+        axis.text.x = element_text(face = "bold",size = 14,color="black", vjust=0.5,family = "serif"),
+        axis.text.y = element_text(face = "bold",size = 14,color="black",family = "serif"),
         strip.background = element_blank(),
-        legend.position = "none",
+        legend.position = "right",
         strip.text.x = element_blank(),
-        legend.title = element_text(face = "bold",size = 12,color="black",family = "Calibri"),
+        legend.title = element_text(face = "bold",size = 12,color="black",family = "serif"),
         plot.margin = margin(0.5, 1, 0.5, 0.5, "cm"),
-        legend.text=element_text(face = "bold",size = 12,color="black",family = "Calibri"),
+        legend.text=element_text(face = "bold",size = 12,color="black",family = "serif"),
         axis.ticks.length = unit(0.15, "cm"))+
   labs(title = "log(alpha)",y = "Value", x = "Iteration") +
   annotate(geom = "text",
            x = post_dim(mod0.mcmc,"saved")/post_dim(mod0.mcmc,"chains"),
            y = max(MCMCchains(mod0.mcmc, params = 'lnalpha')),
            label = paste("hat(R)","~`=`~",round(as.numeric(fit.mod0$BUGSoutput$summary[6,8]),3),sep=""),
-           hjust = 1.0,vjust=0.0,size = 5.1,family = "Calibri",parse = TRUE)+
-  theme(plot.title = element_text(hjust = 0.5,size = 16,face = "bold",family = "Calibri"))
+           hjust = 1.0,vjust=0.0,size = 5.1,family = "serif",parse = TRUE)+
+  theme(plot.title = element_text(hjust = 0.5,size = 16,face = "bold",family = "serif"))
 
 ###### beta
 mod0_beta.trPlot <- ggs_traceplot(mod0.ggs.dat, family = "beta")+
@@ -161,24 +161,24 @@ mod0_beta.trPlot <- ggs_traceplot(mod0.ggs.dat, family = "beta")+
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         axis.line = element_line(color = "black"),
-        axis.title.y = element_text(face = "bold", size = 16,vjust = 1,margin = margin(t = 0, r = 50, b = 0, l = 0),family = "Calibri"),
-        axis.title.x = element_text(face = "bold", size = 16,vjust = -1,margin = margin(t = 10, r = 0, b = 0, l = 0),family = "Calibri"),
-        axis.text.x = element_text(face = "bold",size = 14,color="black", vjust=0.5,family = "Calibri"),
-        axis.text.y = element_text(face = "bold",size = 14,color="black",family = "Calibri"),
+        axis.title.y = element_text(face = "bold", size = 16,vjust = 1,margin = margin(t = 0, r = 50, b = 0, l = 0),family = "serif"),
+        axis.title.x = element_text(face = "bold", size = 16,vjust = -1,margin = margin(t = 10, r = 0, b = 0, l = 0),family = "serif"),
+        axis.text.x = element_text(face = "bold",size = 14,color="black", vjust=0.5,family = "serif"),
+        axis.text.y = element_text(face = "bold",size = 14,color="black",family = "serif"),
         strip.background = element_blank(),
-        legend.position = "none",
+        legend.position = "right",
         strip.text.x = element_blank(),
-        legend.title = element_text(face = "bold",size = 12,color="black",family = "Calibri"),
+        legend.title = element_text(face = "bold",size = 12,color="black",family = "serif"),
         plot.margin = margin(0.5, 1, 0.5, 0.5, "cm"),
-        legend.text=element_text(face = "bold",size = 12,color="black",family = "Calibri"),
+        legend.text=element_text(face = "bold",size = 12,color="black",family = "serif"),
         axis.ticks.length = unit(0.15, "cm"))+
   labs(title = "beta",y = "Value", x = "Iteration") +
   annotate(geom = "text",
            x = post_dim(mod0.mcmc,"saved")/post_dim(mod0.mcmc,"chains"),
            y = max(MCMCchains(mod0.mcmc, params = 'beta')),
            label = paste("hat(R)","~`=`~",round(as.numeric(fit.mod0$BUGSoutput$summary[5,8]),3),sep=""),
-           hjust = 1.0,vjust=0.0,size = 5.1,family = "Calibri",parse = TRUE)+
-  theme(plot.title = element_text(hjust = 0.5,size = 16,face = "bold",family = "Calibri"))
+           hjust = 1.0,vjust=0.0,size = 5.1,family = "serif",parse = TRUE)+
+  theme(plot.title = element_text(hjust = 0.5,size = 16,face = "bold",family = "serif"))
 
 ###### b1
 mod0_b1.trPlot <- ggs_traceplot(mod0.ggs.dat, family = "b1")+
@@ -187,24 +187,24 @@ mod0_b1.trPlot <- ggs_traceplot(mod0.ggs.dat, family = "b1")+
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         axis.line = element_line(color = "black"),
-        axis.title.y = element_text(face = "bold", size = 16,vjust = 1,margin = margin(t = 0, r = 50, b = 0, l = 0),family = "Calibri"),
-        axis.title.x = element_text(face = "bold", size = 16,vjust = -1,margin = margin(t = 10, r = 0, b = 0, l = 0),family = "Calibri"),
-        axis.text.x = element_text(face = "bold",size = 14,color="black", vjust=0.5,family = "Calibri"),
-        axis.text.y = element_text(face = "bold",size = 14,color="black",family = "Calibri"),
+        axis.title.y = element_text(face = "bold", size = 16,vjust = 1,margin = margin(t = 0, r = 50, b = 0, l = 0),family = "serif"),
+        axis.title.x = element_text(face = "bold", size = 16,vjust = -1,margin = margin(t = 10, r = 0, b = 0, l = 0),family = "serif"),
+        axis.text.x = element_text(face = "bold",size = 14,color="black", vjust=0.5,family = "serif"),
+        axis.text.y = element_text(face = "bold",size = 14,color="black",family = "serif"),
         strip.background = element_blank(),
-        legend.position = "none",
+        legend.position = "right",
         strip.text.x = element_blank(),
-        legend.title = element_text(face = "bold",size = 12,color="black",family = "Calibri"),
+        legend.title = element_text(face = "bold",size = 12,color="black",family = "serif"),
         plot.margin = margin(0.5, 1, 0.5, 0.5, "cm"),
-        legend.text=element_text(face = "bold",size = 12,color="black",family = "Calibri"),
+        legend.text=element_text(face = "bold",size = 12,color="black",family = "serif"),
         axis.ticks.length = unit(0.15, "cm"))+
   labs(title = "b1",y = "Value", x = "Iteration") +
   annotate(geom = "text",
            x = post_dim(mod0.mcmc,"saved")/post_dim(mod0.mcmc,"chains"),
            y = max(MCMCchains(mod0.mcmc, params = 'b1')),
            label = paste("hat(R)","~`=`~",round(as.numeric(fit.mod0$BUGSoutput$summary[2,8]),3),sep=""),
-           hjust = 1.0,vjust=0.0,size = 5.1,family = "Calibri",parse = TRUE)+
-  theme(plot.title = element_text(hjust = 0.5,size = 16,face = "bold",family = "Calibri"))
+           hjust = 1.0,vjust=0.0,size = 5.1,family = "serif",parse = TRUE)+
+  theme(plot.title = element_text(hjust = 0.5,size = 16,face = "bold",family = "serif"))
 
 ###### b2
 mod0_b2.trPlot <- ggs_traceplot(mod0.ggs.dat, family = "b2")+
@@ -213,24 +213,24 @@ mod0_b2.trPlot <- ggs_traceplot(mod0.ggs.dat, family = "b2")+
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         axis.line = element_line(color = "black"),
-        axis.title.y = element_text(face = "bold", size = 16,vjust = 1,margin = margin(t = 0, r = 50, b = 0, l = 0),family = "Calibri"),
-        axis.title.x = element_text(face = "bold", size = 16,vjust = -1,margin = margin(t = 10, r = 0, b = 0, l = 0),family = "Calibri"),
-        axis.text.x = element_text(face = "bold",size = 14,color="black", vjust=0.5,family = "Calibri"),
-        axis.text.y = element_text(face = "bold",size = 14,color="black",family = "Calibri"),
+        axis.title.y = element_text(face = "bold", size = 16,vjust = 1,margin = margin(t = 0, r = 50, b = 0, l = 0),family = "serif"),
+        axis.title.x = element_text(face = "bold", size = 16,vjust = -1,margin = margin(t = 10, r = 0, b = 0, l = 0),family = "serif"),
+        axis.text.x = element_text(face = "bold",size = 14,color="black", vjust=0.5,family = "serif"),
+        axis.text.y = element_text(face = "bold",size = 14,color="black",family = "serif"),
         strip.background = element_blank(),
-        legend.position = "none",
+        legend.position = "right",
         strip.text.x = element_blank(),
-        legend.title = element_text(face = "bold",size = 12,color="black",family = "Calibri"),
+        legend.title = element_text(face = "bold",size = 12,color="black",family = "serif"),
         plot.margin = margin(0.5, 1, 0.5, 0.5, "cm"),
-        legend.text=element_text(face = "bold",size = 12,color="black",family = "Calibri"),
+        legend.text=element_text(face = "bold",size = 12,color="black",family = "serif"),
         axis.ticks.length = unit(0.15, "cm"))+
   labs(title = "b2",y = "Value", x = "Iteration") +
   annotate(geom = "text",
            x = post_dim(mod0.mcmc,"saved")/post_dim(mod0.mcmc,"chains"),
            y = max(MCMCchains(mod0.mcmc, params = 'b2')),
            label = paste("hat(R)","~`=`~",round(as.numeric(fit.mod0$BUGSoutput$summary[3,8]),3),sep=""),
-           hjust = 1.0,vjust=0.0,size = 5.1,family = "Calibri",parse = TRUE)+
-  theme(plot.title = element_text(hjust = 0.5,size = 16,face = "bold",family = "Calibri"))
+           hjust = 1.0,vjust=0.0,size = 5.1,family = "serif",parse = TRUE)+
+  theme(plot.title = element_text(hjust = 0.5,size = 16,face = "bold",family = "serif"))
 
 ###### b3
 mod0_b3.trPlot <- ggs_traceplot(mod0.ggs.dat, family = "b3")+
@@ -239,24 +239,24 @@ mod0_b3.trPlot <- ggs_traceplot(mod0.ggs.dat, family = "b3")+
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         axis.line = element_line(color = "black"),
-        axis.title.y = element_text(face = "bold", size = 16,vjust = 1,margin = margin(t = 0, r = 50, b = 0, l = 0),family = "Calibri"),
-        axis.title.x = element_text(face = "bold", size = 16,vjust = -1,margin = margin(t = 10, r = 0, b = 0, l = 0),family = "Calibri"),
-        axis.text.x = element_text(face = "bold",size = 14,color="black", vjust=0.5,family = "Calibri"),
-        axis.text.y = element_text(face = "bold",size = 14,color="black",family = "Calibri"),
+        axis.title.y = element_text(face = "bold", size = 16,vjust = 1,margin = margin(t = 0, r = 50, b = 0, l = 0),family = "serif"),
+        axis.title.x = element_text(face = "bold", size = 16,vjust = -1,margin = margin(t = 10, r = 0, b = 0, l = 0),family = "serif"),
+        axis.text.x = element_text(face = "bold",size = 14,color="black", vjust=0.5,family = "serif"),
+        axis.text.y = element_text(face = "bold",size = 14,color="black",family = "serif"),
         strip.background = element_blank(),
-        legend.position = "none",
+        legend.position = "right",
         strip.text.x = element_blank(),
-        legend.title = element_text(face = "bold",size = 12,color="black",family = "Calibri"),
+        legend.title = element_text(face = "bold",size = 12,color="black",family = "serif"),
         plot.margin = margin(0.5, 1, 0.5, 0.5, "cm"),
-        legend.text=element_text(face = "bold",size = 12,color="black",family = "Calibri"),
+        legend.text=element_text(face = "bold",size = 12,color="black",family = "serif"),
         axis.ticks.length = unit(0.15, "cm"))+
   labs(title = "b3",y = "Value", x = "Iteration") +
   annotate(geom = "text",
            x = post_dim(mod0.mcmc,"saved")/post_dim(mod0.mcmc,"chains"),
            y = max(MCMCchains(mod0.mcmc, params = 'b3')),
            label = paste("hat(R)","~`=`~",round(as.numeric(fit.mod0$BUGSoutput$summary[4,8]),3),sep=""),
-           hjust = 1.0,vjust=0.0,size = 5.1,family = "Calibri",parse = TRUE)+
-  theme(plot.title = element_text(hjust = 0.5,size = 16,face = "bold",family = "Calibri"))
+           hjust = 1.0,vjust=0.0,size = 5.1,family = "serif",parse = TRUE)+
+  theme(plot.title = element_text(hjust = 0.5,size = 16,face = "bold",family = "serif"))
 
 ###### tau
 mod0_tau.trPlot <- ggs_traceplot(mod0.ggs.dat, family = "tau")+
@@ -265,24 +265,24 @@ mod0_tau.trPlot <- ggs_traceplot(mod0.ggs.dat, family = "tau")+
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         axis.line = element_line(color = "black"),
-        axis.title.y = element_text(face = "bold", size = 16,vjust = 1,margin = margin(t = 0, r = 50, b = 0, l = 0),family = "Calibri"),
-        axis.title.x = element_text(face = "bold", size = 16,vjust = -1,margin = margin(t = 10, r = 0, b = 0, l = 0),family = "Calibri"),
-        axis.text.x = element_text(face = "bold",size = 14,color="black", vjust=0.5,family = "Calibri"),
-        axis.text.y = element_text(face = "bold",size = 14,color="black",family = "Calibri"),
+        axis.title.y = element_text(face = "bold", size = 16,vjust = 1,margin = margin(t = 0, r = 50, b = 0, l = 0),family = "serif"),
+        axis.title.x = element_text(face = "bold", size = 16,vjust = -1,margin = margin(t = 10, r = 0, b = 0, l = 0),family = "serif"),
+        axis.text.x = element_text(face = "bold",size = 14,color="black", vjust=0.5,family = "serif"),
+        axis.text.y = element_text(face = "bold",size = 14,color="black",family = "serif"),
         strip.background = element_blank(),
-        legend.position = "none",
+        legend.position = "right",
         strip.text.x = element_blank(),
-        legend.title = element_text(face = "bold",size = 12,color="black",family = "Calibri"),
+        legend.title = element_text(face = "bold",size = 12,color="black",family = "serif"),
         plot.margin = margin(0.5, 1, 0.5, 0.5, "cm"),
-        legend.text=element_text(face = "bold",size = 12,color="black",family = "Calibri"),
+        legend.text=element_text(face = "bold",size = 12,color="black",family = "serif"),
         axis.ticks.length = unit(0.15, "cm"))+
   labs(title = "tau",y = "Value", x = "Iteration") +
   annotate(geom = "text",
            x = post_dim(mod0.mcmc,"saved")/post_dim(mod0.mcmc,"chains"),
            y = max(MCMCchains(mod0.mcmc, params = 'tau')),
            label = paste("hat(R)","~`=`~",round(as.numeric(fit.mod0$BUGSoutput$summary[7,8]),3),sep=""),
-           hjust = 1.0,vjust=0.0,size = 5.1,family = "Calibri",parse = TRUE)+
-  theme(plot.title = element_text(hjust = 0.5,size = 16,face = "bold",family = "Calibri"))
+           hjust = 1.0,vjust=0.0,size = 5.1,family = "serif",parse = TRUE)+
+  theme(plot.title = element_text(hjust = 0.5,size = 16,face = "bold",family = "serif"))
 
 ##### density
 ###### log(alpha)
@@ -292,19 +292,19 @@ mod0_lnalpha.densPlot <- ggs_density(mod0.ggs.dat, family = "lnalpha")+
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         axis.line = element_line(color = "black"),
-        axis.title.y = element_text(face = "bold", size = 16,vjust = 1,margin = margin(t = 0, r = 50, b = 0, l = 0),family = "Calibri"),
-        axis.title.x = element_text(face = "bold", size = 16,vjust = -1,margin = margin(t = 10, r = 0, b = 0, l = 0),family = "Calibri"),
-        axis.text.x = element_text(face = "bold",size = 14,color="black", vjust=0.5,family = "Calibri"),
-        axis.text.y = element_text(face = "bold",size = 14,color="black",family = "Calibri"),
+        axis.title.y = element_text(face = "bold", size = 16,vjust = 1,margin = margin(t = 0, r = 50, b = 0, l = 0),family = "serif"),
+        axis.title.x = element_text(face = "bold", size = 16,vjust = -1,margin = margin(t = 10, r = 0, b = 0, l = 0),family = "serif"),
+        axis.text.x = element_text(face = "bold",size = 14,color="black", vjust=0.5,family = "serif"),
+        axis.text.y = element_text(face = "bold",size = 14,color="black",family = "serif"),
         strip.background = element_blank(),
         legend.position = "none",
         strip.text.x = element_blank(),
-        legend.title = element_text(face = "bold",size = 12,color="black",family = "Calibri"),
+        legend.title = element_text(face = "bold",size = 12,color="black",family = "serif"),
         plot.margin = margin(0.5, 1, 0.5, 0.5, "cm"),
-        legend.text=element_text(face = "bold",size = 12,color="black",family = "Calibri"),
+        legend.text=element_text(face = "bold",size = 12,color="black",family = "serif"),
         axis.ticks.length = unit(0.15, "cm"))+
-  labs(title = "log(alpha)",y = "Density", x = "Value") +
-  theme(plot.title = element_text(hjust = 0.5,size = 16,face = "bold",family = "Calibri"))
+  labs(title = "",y = "Density", x = "Value") +
+  theme(plot.title = element_text(hjust = 0.5,size = 16,face = "bold",family = "serif"))
 
 ###### beta
 mod0_beta.densPlot <- ggs_density(mod0.ggs.dat, family = "beta")+
@@ -313,19 +313,19 @@ mod0_beta.densPlot <- ggs_density(mod0.ggs.dat, family = "beta")+
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         axis.line = element_line(color = "black"),
-        axis.title.y = element_text(face = "bold", size = 16,vjust = 1,margin = margin(t = 0, r = 50, b = 0, l = 0),family = "Calibri"),
-        axis.title.x = element_text(face = "bold", size = 16,vjust = -1,margin = margin(t = 10, r = 0, b = 0, l = 0),family = "Calibri"),
-        axis.text.x = element_text(face = "bold",size = 14,color="black", vjust=0.5,family = "Calibri"),
-        axis.text.y = element_text(face = "bold",size = 14,color="black",family = "Calibri"),
+        axis.title.y = element_text(face = "bold", size = 16,vjust = 1,margin = margin(t = 0, r = 50, b = 0, l = 0),family = "serif"),
+        axis.title.x = element_text(face = "bold", size = 16,vjust = -1,margin = margin(t = 10, r = 0, b = 0, l = 0),family = "serif"),
+        axis.text.x = element_text(face = "bold",size = 14,color="black", vjust=0.5,family = "serif"),
+        axis.text.y = element_text(face = "bold",size = 14,color="black",family = "serif"),
         strip.background = element_blank(),
         legend.position = "none",
         strip.text.x = element_blank(),
-        legend.title = element_text(face = "bold",size = 12,color="black",family = "Calibri"),
+        legend.title = element_text(face = "bold",size = 12,color="black",family = "serif"),
         plot.margin = margin(0.5, 1, 0.5, 0.5, "cm"),
-        legend.text=element_text(face = "bold",size = 12,color="black",family = "Calibri"),
+        legend.text=element_text(face = "bold",size = 12,color="black",family = "serif"),
         axis.ticks.length = unit(0.15, "cm"))+
   labs(title = "beta",y = "Density", x = "Value") +
-  theme(plot.title = element_text(hjust = 0.5,size = 16,face = "bold",family = "Calibri"))
+  theme(plot.title = element_text(hjust = 0.5,size = 16,face = "bold",family = "serif"))
 
 ###### b1
 mod0_b1.densPlot <- ggs_density(mod0.ggs.dat, family = "b1")+
@@ -334,19 +334,19 @@ mod0_b1.densPlot <- ggs_density(mod0.ggs.dat, family = "b1")+
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         axis.line = element_line(color = "black"),
-        axis.title.y = element_text(face = "bold", size = 16,vjust = 1,margin = margin(t = 0, r = 50, b = 0, l = 0),family = "Calibri"),
-        axis.title.x = element_text(face = "bold", size = 16,vjust = -1,margin = margin(t = 10, r = 0, b = 0, l = 0),family = "Calibri"),
-        axis.text.x = element_text(face = "bold",size = 14,color="black", vjust=0.5,family = "Calibri"),
-        axis.text.y = element_text(face = "bold",size = 14,color="black",family = "Calibri"),
+        axis.title.y = element_text(face = "bold", size = 16,vjust = 1,margin = margin(t = 0, r = 50, b = 0, l = 0),family = "serif"),
+        axis.title.x = element_text(face = "bold", size = 16,vjust = -1,margin = margin(t = 10, r = 0, b = 0, l = 0),family = "serif"),
+        axis.text.x = element_text(face = "bold",size = 14,color="black", vjust=0.5,family = "serif"),
+        axis.text.y = element_text(face = "bold",size = 14,color="black",family = "serif"),
         strip.background = element_blank(),
         legend.position = "none",
         strip.text.x = element_blank(),
-        legend.title = element_text(face = "bold",size = 12,color="black",family = "Calibri"),
+        legend.title = element_text(face = "bold",size = 12,color="black",family = "serif"),
         plot.margin = margin(0.5, 1, 0.5, 0.5, "cm"),
-        legend.text=element_text(face = "bold",size = 12,color="black",family = "Calibri"),
+        legend.text=element_text(face = "bold",size = 12,color="black",family = "serif"),
         axis.ticks.length = unit(0.15, "cm"))+
-  labs(title = "b1",y = "Density", x = "Value") +
-  theme(plot.title = element_text(hjust = 0.5,size = 16,face = "bold",family = "Calibri"))
+  labs(title = "",y = "Density", x = "Value") +
+  theme(plot.title = element_text(hjust = 0.5,size = 16,face = "bold",family = "serif"))
 
 ###### b2
 mod0_b2.densPlot <- ggs_density(mod0.ggs.dat, family = "b2")+
@@ -355,19 +355,19 @@ mod0_b2.densPlot <- ggs_density(mod0.ggs.dat, family = "b2")+
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         axis.line = element_line(color = "black"),
-        axis.title.y = element_text(face = "bold", size = 16,vjust = 1,margin = margin(t = 0, r = 50, b = 0, l = 0),family = "Calibri"),
-        axis.title.x = element_text(face = "bold", size = 16,vjust = -1,margin = margin(t = 10, r = 0, b = 0, l = 0),family = "Calibri"),
-        axis.text.x = element_text(face = "bold",size = 14,color="black", vjust=0.5,family = "Calibri"),
-        axis.text.y = element_text(face = "bold",size = 14,color="black",family = "Calibri"),
+        axis.title.y = element_text(face = "bold", size = 16,vjust = 1,margin = margin(t = 0, r = 50, b = 0, l = 0),family = "serif"),
+        axis.title.x = element_text(face = "bold", size = 16,vjust = -1,margin = margin(t = 10, r = 0, b = 0, l = 0),family = "serif"),
+        axis.text.x = element_text(face = "bold",size = 14,color="black", vjust=0.5,family = "serif"),
+        axis.text.y = element_text(face = "bold",size = 14,color="black",family = "serif"),
         strip.background = element_blank(),
         legend.position = "none",
         strip.text.x = element_blank(),
-        legend.title = element_text(face = "bold",size = 12,color="black",family = "Calibri"),
+        legend.title = element_text(face = "bold",size = 12,color="black",family = "serif"),
         plot.margin = margin(0.5, 1, 0.5, 0.5, "cm"),
-        legend.text=element_text(face = "bold",size = 12,color="black",family = "Calibri"),
+        legend.text=element_text(face = "bold",size = 12,color="black",family = "serif"),
         axis.ticks.length = unit(0.15, "cm"))+
-  labs(title = "b2",y = "Density", x = "Value") +
-  theme(plot.title = element_text(hjust = 0.5,size = 16,face = "bold",family = "Calibri"))
+  labs(title = "",y = "Density", x = "Value") +
+  theme(plot.title = element_text(hjust = 0.5,size = 16,face = "bold",family = "serif"))
 
 ###### b3
 mod0_b3.densPlot <- ggs_density(mod0.ggs.dat, family = "b3")+
@@ -376,19 +376,19 @@ mod0_b3.densPlot <- ggs_density(mod0.ggs.dat, family = "b3")+
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         axis.line = element_line(color = "black"),
-        axis.title.y = element_text(face = "bold", size = 16,vjust = 1,margin = margin(t = 0, r = 50, b = 0, l = 0),family = "Calibri"),
-        axis.title.x = element_text(face = "bold", size = 16,vjust = -1,margin = margin(t = 10, r = 0, b = 0, l = 0),family = "Calibri"),
-        axis.text.x = element_text(face = "bold",size = 14,color="black", vjust=0.5,family = "Calibri"),
-        axis.text.y = element_text(face = "bold",size = 14,color="black",family = "Calibri"),
+        axis.title.y = element_text(face = "bold", size = 16,vjust = 1,margin = margin(t = 0, r = 50, b = 0, l = 0),family = "serif"),
+        axis.title.x = element_text(face = "bold", size = 16,vjust = -1,margin = margin(t = 10, r = 0, b = 0, l = 0),family = "serif"),
+        axis.text.x = element_text(face = "bold",size = 14,color="black", vjust=0.5,family = "serif"),
+        axis.text.y = element_text(face = "bold",size = 14,color="black",family = "serif"),
         strip.background = element_blank(),
         legend.position = "none",
         strip.text.x = element_blank(),
-        legend.title = element_text(face = "bold",size = 12,color="black",family = "Calibri"),
+        legend.title = element_text(face = "bold",size = 12,color="black",family = "serif"),
         plot.margin = margin(0.5, 1, 0.5, 0.5, "cm"),
-        legend.text=element_text(face = "bold",size = 12,color="black",family = "Calibri"),
+        legend.text=element_text(face = "bold",size = 12,color="black",family = "serif"),
         axis.ticks.length = unit(0.15, "cm"))+
   labs(title = "b3",y = "Density", x = "Value") +
-  theme(plot.title = element_text(hjust = 0.5,size = 16,face = "bold",family = "Calibri"))
+  theme(plot.title = element_text(hjust = 0.5,size = 16,face = "bold",family = "serif"))
 
 ###### tau
 mod0_tau.densPlot <- ggs_density(mod0.ggs.dat, family = "tau")+
@@ -397,22 +397,113 @@ mod0_tau.densPlot <- ggs_density(mod0.ggs.dat, family = "tau")+
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         axis.line = element_line(color = "black"),
-        axis.title.y = element_text(face = "bold", size = 16,vjust = 1,margin = margin(t = 0, r = 50, b = 0, l = 0),family = "Calibri"),
-        axis.title.x = element_text(face = "bold", size = 16,vjust = -1,margin = margin(t = 10, r = 0, b = 0, l = 0),family = "Calibri"),
-        axis.text.x = element_text(face = "bold",size = 14,color="black", vjust=0.5,family = "Calibri"),
-        axis.text.y = element_text(face = "bold",size = 14,color="black",family = "Calibri"),
+        axis.title.y = element_text(face = "bold", size = 16,vjust = 1,margin = margin(t = 0, r = 50, b = 0, l = 0),family = "serif"),
+        axis.title.x = element_text(face = "bold", size = 16,vjust = -1,margin = margin(t = 10, r = 0, b = 0, l = 0),family = "serif"),
+        axis.text.x = element_text(face = "bold",size = 14,color="black", vjust=0.5,family = "serif"),
+        axis.text.y = element_text(face = "bold",size = 14,color="black",family = "serif"),
         strip.background = element_blank(),
         legend.position = "none",
         strip.text.x = element_blank(),
-        legend.title = element_text(face = "bold",size = 12,color="black",family = "Calibri"),
+        legend.title = element_text(face = "bold",size = 12,color="black",family = "serif"),
         plot.margin = margin(0.5, 1, 0.5, 0.5, "cm"),
-        legend.text=element_text(face = "bold",size = 12,color="black",family = "Calibri"),
+        legend.text=element_text(face = "bold",size = 12,color="black",family = "serif"),
         axis.ticks.length = unit(0.15, "cm"))+
-  labs(title = "tau",y = "Density", x = "Value") +
-  theme(plot.title = element_text(hjust = 0.5,size = 16,face = "bold",family = "Calibri"))
+  labs(title = "",y = "Density", x = "Value") +
+  theme(plot.title = element_text(hjust = 0.5,size = 16,face = "bold",family = "serif"))
 
-### combined plots
+##### combined plots
+###### log(alpha)
+mod0_lnalpha.combPlot<-ggarrange(mod0_lnalpha.trPlot,
+                                 mod0_lnalpha.densPlot,
+                                 ncol = 1,
+                                 nrow = 2)
 
+png(paste("Output\\Figures\\Diagnostic\\MCMC\\mod0\\mod0_lnalpha.comb_tr_dens_plot",".png",sep=""),
+    type="cairo",
+    units="in",
+    width=9,
+    height=12,
+    res=300)
 
+print(mod0_lnalpha.combPlot)
+dev.off()
 
-### density plots
+###### beta
+mod0_beta.combPlot<-ggarrange(mod0_beta.trPlot,
+                              mod0_beta.densPlot,
+                              ncol = 1,
+                              nrow = 2)
+
+png(paste("Output\\Figures\\Diagnostic\\MCMC\\mod0\\mod0_beta.comb_tr_dens_plot",".png",sep=""),
+    type="cairo",
+    units="in",
+    width=9,
+    height=12,
+    res=300)
+
+print(mod0_beta.combPlot)
+dev.off()
+
+###### b1
+mod0_b1.combPlot<-ggarrange(mod0_b1.trPlot,
+                            mod0_b1.densPlot,
+                            ncol = 1,
+                            nrow = 2)
+
+png(paste("Output\\Figures\\Diagnostic\\MCMC\\mod0\\mod0_b1.comb_tr_dens_plot",".png",sep=""),
+    type="cairo",
+    units="in",
+    width=9,
+    height=12,
+    res=300)
+
+print(mod0_b1.combPlot)
+dev.off()
+
+###### b2
+mod0_b2.combPlot<-ggarrange(mod0_b2.trPlot,
+                            mod0_b2.densPlot,
+                            ncol = 1,
+                            nrow = 2)
+
+png(paste("Output\\Figures\\Diagnostic\\MCMC\\mod0\\mod0_b2.comb_tr_dens_plot",".png",sep=""),
+    type="cairo",
+    units="in",
+    width=9,
+    height=12,
+    res=300)
+
+print(mod0_b2.combPlot)
+dev.off()
+
+###### b3
+mod0_b3.combPlot<-ggarrange(mod0_b3.trPlot,
+                            mod0_b3.densPlot,
+                            ncol = 1,
+                            nrow = 2)
+
+png(paste("Output\\Figures\\Diagnostic\\MCMC\\mod0\\mod0_b3.comb_tr_dens_plot",".png",sep=""),
+    type="cairo",
+    units="in",
+    width=9,
+    height=12,
+    res=300)
+
+print(mod0_b3.combPlot)
+dev.off()
+
+###### tau
+mod0_tau.combPlot<-ggarrange(mod0_tau.trPlot,
+                             mod0_tau.densPlot,
+                             ncol = 1,
+                             nrow = 2)
+
+png(paste("Output\\Figures\\Diagnostic\\MCMC\\mod0\\mod0_tau.comb_tr_dens_plot",".png",sep=""),
+    type="cairo",
+    units="in",
+    width=9,
+    height=12,
+    res=300)
+
+print(mod0_tau.combPlot)
+dev.off()
