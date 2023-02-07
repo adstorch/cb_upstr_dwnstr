@@ -543,7 +543,7 @@ mod0.plotData <- data.frame(brd_yr = cb_upstr_dwnstr.dat$brd_yr,
 
 ######## generate plot
 ## generate chapter plot
-cbpSARequiv.plot_lawry<-ggplot() +
+mod0.plot_insamp<-ggplot() +
   theme_bw()+
   theme(panel.border = element_blank(),
         panel.grid.major = element_blank(),
@@ -557,18 +557,19 @@ cbpSARequiv.plot_lawry<-ggplot() +
         plot.margin = margin(0.5, 1, 0.5, 0.5, "cm"),
         legend.text=element_text(size=12),
         axis.ticks.length = unit(0.15, "cm"))+
-  labs(title ="Lawry (2020) & McCann (2022)", y = "SAR", x = "Escapement to Lower Granite Dam") +
+  labs(title ="model 0: global model (non-hierarchical)", y = bquote(bold('log'[e]*"(Recruits/Spawner)")), x = "Brood Year") +
   theme(plot.title = element_text(hjust = 0.5,size = 16,face = "bold",family = "serif")) +
-  geom_ribbon(data =subset(newdata.law,xPred.law >= min(subset(cbpSARequiv.datRed,src=="lawry",select=c(esc))) & xPred.law <= hiCBP),aes(x = xPred.law,ymin = conf.low,ymax = conf.high),alpha=0.3,fill = "#56B4E9")+
-  geom_line(data = subset(newdata.law,xPred.law >= min(subset(cbpSARequiv.datRed,src=="lawry",select=c(esc))) & xPred.law <= max(subset(cbpSARequiv.datRed,src=="lawry",select=c(esc)))),aes(xPred.law, estimate), size = 1.0,color = "#56B4E9")+
-  
-  geom_point(data = subset(cbpSARequiv.datRed,src=="lawry", select = c(sar,esc)),aes(esc,sar),shape = 21,size = 3.5,stroke=0.5, fill = "#56B4E9")+
-  scale_y_continuous(limits=c(0,0.17),breaks = seq(0,0.17,0.020),labels = function(x) sprintf("%.1f%%", x*100), expand = c(0,0))+
-  scale_x_continuous(limits=c(0,hiCBP+10000),breaks = seq(0,hiCBP+10000,25000),labels = function(x) format(x, big.mark = ",", scientific = FALSE), expand = c(0,0))
+  geom_ribbon(data = mod0.plotData,aes(x = brd_yr,ymin = conf.low,ymax = conf.high),alpha=0.3,fill = "gray")+
+  geom_line(data = mod0.plotData,aes(brd_yr, estimate), size = 1.0,color = "black")+
+  geom_point(data = mod0.plotData,aes(brd_yr,lnrs),shape = 21,size = 3.5,stroke=0.5)+
+  geom_hline(yintercept = 0,linetype = 2)+
+  scale_y_continuous(limits=c(-ceiling(max(abs(max(mod0.plotData$conf.low)),abs(max(mod0.plotData$conf.high)))),ceiling(max(abs(max(mod0.plotData$conf.low)),abs(max(mod0.plotData$conf.high))))),
+                     breaks = seq(-ceiling(max(abs(max(mod0.plotData$conf.low)),abs(max(mod0.plotData$conf.high)))),ceiling(max(abs(max(mod0.plotData$conf.low)),abs(max(mod0.plotData$conf.high)))),2.0))+
+  scale_x_continuous(limits=c(min(mod0.plotData$brd_yr),max(mod0.plotData$brd_yr)),breaks = seq(min(mod0.plotData$brd_yr),max(mod0.plotData$brd_yr),3))
 
 ## output chapter plot
 ### set image output parameters
-png(filename="Output\\Figures\\Bayesian\\Data plots\\cbpSARequivPlot_lawry.png",
+png(filename="Output\\Figures\\Fit\\Pred v Estms\\mod0\\mod0_plot_insamp.png",
     type="cairo",
     units="in",
     width=9,
@@ -576,7 +577,7 @@ png(filename="Output\\Figures\\Bayesian\\Data plots\\cbpSARequivPlot_lawry.png",
     res=300)
 
 ### write object to working directory
-print(cbpSARequiv.plot_lawry)
+print(mod0.plot_insamp)
 dev.off()
 
 
