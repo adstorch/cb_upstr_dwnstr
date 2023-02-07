@@ -127,7 +127,7 @@ mod0.mcmc <- as.mcmc(fit.mod0)
 mod0.ggs.dat <- ggs(mod0.mcmc)
 
 #### plots (these will have to be manipulated based on covariates selected)
-##### MCMC
+##### MCMC (diagnostics)
 ###### trace
 ####### log(alpha)
 mod0_lnalpha.trPlot <- ggs_traceplot(mod0.ggs.dat, family = "lnalpha")+
@@ -508,3 +508,75 @@ png(paste("Output\\Figures\\Diagnostic\\MCMC\\mod0\\mod0_tau.comb_tr_dens_plot",
 
 print(mod0_tau.combPlot)
 dev.off()
+
+##### model output (predictions, etc.)
+###### pred. vs. estms.
+####### generate predictions
+######## isolate simulations matrix
+mod0.mcmc = fit.mod0$BUGSoutput$sims.matrix
+
+######## isolate covariate values to generate predictions 
+mod0.newdata = data.frame(S = mod0.dat$S,
+                                    cov1 = mod0.dat$cov1,
+                                    cov2 = mod0.dat$cov2,
+                                    cov3 = mod0.dat$cov3)
+
+######## generate model matrix
+mod0.Xmat = model.matrix(~S+cov1+cov2+cov3, mod0.newdata)[,2:5]
+
+######## isolate predictors
+mod0.coefs = mod0.mcmc[, c("beta",
+                      "b1",
+                      "b2",
+                      "b3")]
+
+######## simulate predictions
+mod0.fit.pred = mod0.coefs %*% t(mod0.Xmat)
+
+######## consolidate covariate values and predictions (including HPD intervals)
+mod0.newdata = mod0.newdata %>% cbind(tidyMCMC(mod0.fit.pred, conf.int = TRUE, conf.method = "HPDinterval"))
+
+######## manipulate data for plotting
+mod0.plotData <- data.frame(brd_yr = cb_upstr_dwnstr.dat$brd_yr,
+                            lnrs = log(cb_upstr_dwnstr.dat$rs),
+                            mod0.newdata)
+
+######## generate plot
+## generate chapter plot
+cbpSARequiv.plot_lawry<-ggplot() +
+  theme_bw()+
+  theme(panel.border = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(color = "black"),
+        axis.title.y = element_text(face = "bold", size = 16,vjust = 1,margin = margin(t = 0, r = 10, b = 0, l = 0),family = "serif"),
+        axis.title.x = element_text(face = "bold", size = 16,vjust = -1,margin = margin(t = 10, r = 0, b = 0, l = 0),family = "serif"),
+        axis.text.x = element_text(face = "bold",size = 14,color="black", vjust=0.5,family = "serif"),
+        axis.text.y = element_text(face = "bold",size = 14,color="black",family = "serif"),
+        legend.title = element_blank(),
+        plot.margin = margin(0.5, 1, 0.5, 0.5, "cm"),
+        legend.text=element_text(size=12),
+        axis.ticks.length = unit(0.15, "cm"))+
+  labs(title ="Lawry (2020) & McCann (2022)", y = "SAR", x = "Escapement to Lower Granite Dam") +
+  theme(plot.title = element_text(hjust = 0.5,size = 16,face = "bold",family = "serif")) +
+  geom_ribbon(data =subset(newdata.law,xPred.law >= min(subset(cbpSARequiv.datRed,src=="lawry",select=c(esc))) & xPred.law <= hiCBP),aes(x = xPred.law,ymin = conf.low,ymax = conf.high),alpha=0.3,fill = "#56B4E9")+
+  geom_line(data = subset(newdata.law,xPred.law >= min(subset(cbpSARequiv.datRed,src=="lawry",select=c(esc))) & xPred.law <= max(subset(cbpSARequiv.datRed,src=="lawry",select=c(esc)))),aes(xPred.law, estimate), size = 1.0,color = "#56B4E9")+
+  
+  geom_point(data = subset(cbpSARequiv.datRed,src=="lawry", select = c(sar,esc)),aes(esc,sar),shape = 21,size = 3.5,stroke=0.5, fill = "#56B4E9")+
+  scale_y_continuous(limits=c(0,0.17),breaks = seq(0,0.17,0.020),labels = function(x) sprintf("%.1f%%", x*100), expand = c(0,0))+
+  scale_x_continuous(limits=c(0,hiCBP+10000),breaks = seq(0,hiCBP+10000,25000),labels = function(x) format(x, big.mark = ",", scientific = FALSE), expand = c(0,0))
+
+## output chapter plot
+### set image output parameters
+png(filename="Output\\Figures\\Bayesian\\Data plots\\cbpSARequivPlot_lawry.png",
+    type="cairo",
+    units="in",
+    width=9,
+    height=6,
+    res=300)
+
+### write object to working directory
+print(cbpSARequiv.plot_lawry)
+dev.off()
+
+
