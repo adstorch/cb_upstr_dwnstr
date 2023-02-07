@@ -9,7 +9,8 @@ packages <- c("openxlsx",
               "car",
               "extrafont",
               "remotes",
-              "loo")
+              "loo",
+              "ggpubr")
 
 if (!require(install.load)) {
   install.packages("install.load")
