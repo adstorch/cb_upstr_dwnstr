@@ -1,16 +1,24 @@
 # call packages -----------------------------------------------------------
 packages <- c("openxlsx",
               "ggplot2",
+              "tidymv",
+              "car",
+              "ggfortify",
+              "gridExtra",
+              "grid",
+              "ggpubr",
+              "openair",
+              "cvTools",
+              "extrafont",
+              "remotes",
               "R2jags",
+              "dplyr",
+              "broom.mixed",
+              "boot",
               "ggmcmc",
               "scales",
               "postpack",
-              "MCMCvis",
-              "car",
-              "extrafont",
-              "remotes",
-              "loo",
-              "ggpubr")
+              "MCMCvis")
 
 if (!require(install.load)) {
   install.packages("install.load")
@@ -32,9 +40,10 @@ cb_upstr_dwnstr.dat <- read.xlsx("Data\\Input Data\\cb_upstr_dwnstr_inp_data.xls
                          colNames = TRUE)
 
 ## data manipulation
-cb_upstr_dwnstr.dat <- subset(cb_upstr_dwnstr.dat, brd_yr>=2000 & brd_yr<=2015)
+cb_upstr_dwnstr.dat <- subset(cb_upstr_dwnstr.dat, brd_yr>=2000 & brd_yr<=2015 & popn=="grcat")
 cb_upstr_dwnstr.dat$rs <- cb_upstr_dwnstr.dat$nat_recruits/cb_upstr_dwnstr.dat$tot_spnrs
 cb_upstr_dwnstr.dat$basin_index <- ifelse(cb_upstr_dwnstr.dat$basin=="sr",1,2)
+cb_upstr_dwnstr.dat$lnrs <- log(cb_upstr_dwnstr.dat$rs)
 
 ### covariate placeholders (for framework development only--can be deleted after we develop covariates)
 cb_upstr_dwnstr.dat$cov1 <- rnorm(nrow(cb_upstr_dwnstr.dat),20,3)
