@@ -579,5 +579,3 @@ png(filename="Output\\Figures\\Fit\\Pred v Estms\\mod0\\mod0_plot_insamp.png",
 ### write object to working directory
 print(mod0.plot_insamp)
 dev.off()
-
-
