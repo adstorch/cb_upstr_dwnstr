@@ -126,8 +126,8 @@ waic.mod0 <- round(c(waic = tmp[["waic"]], p_waic = tmp[["p_waic"]]),1)
 mod0.mcmc <- as.mcmc(fit.mod0)
 mod0.ggs.dat <- ggs(mod0.mcmc)
 
-#### plots (these will have to be manipulated based on covariates selected)
-##### MCMC (diagnostics)
+#### diagnostics
+##### MCMC
 ###### trace
 ####### log(alpha)
 mod0_lnalpha.trPlot <- ggs_traceplot(mod0.ggs.dat, family = "lnalpha")+
@@ -517,11 +517,15 @@ post.lnalpha <- jags.samples(fit.mod0,
                      n.iter=20000)
 
 
-acf(fit.mod0$BUGSoutput$sims.array[,1])
+test <- autocorr.diag(mod0.mcmc)
+raftery.diag(mod0.mcmc)
 
-str(fit.mod0)
+data.frame(b1 = test[,2],
+           b2 = test[,2])
 
-##### model output (predictions, etc.)
+test
+
+##### plots
 ###### pred. vs. estms.
 ####### generate predictions
 ######## isolate simulations matrix
