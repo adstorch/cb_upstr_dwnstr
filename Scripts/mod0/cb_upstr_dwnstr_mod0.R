@@ -27,8 +27,7 @@ cat('
       # mu_pop[pop_vec[i]] ~ dnorm(mu_basin[basin_vec[i]], taub_a)
       
       log_RS[i] ~ dnorm(mu_log_RS[i],tau)
-      # centered (continuous) covariates
-      mu_log_RS[i] <- lnalpha - beta * (S[i] - mean(S[]) + b1 * (cov1[i]-mean(cov1[]) + b2 * (cov2[i]-mean(cov2[]) + b3 * (cov3[i]-mean(cov3[])
+      mu_log_RS[i] <- lnalpha - beta * S[i] + b1 * cov1[i] + b2 * cov2[i] + b3 * cov3[i]
       
       # + b1 * basin[]
       
@@ -509,6 +508,18 @@ png(paste("Output\\Figures\\Diagnostic\\MCMC\\mod0\\mod0_tau.comb_tr_dens_plot",
 
 print(mod0_tau.combPlot)
 dev.off()
+
+###### auto-correlation
+update(fit.mod0, 10000)
+####### log(alpha)
+post.lnalpha <- jags.samples(fit.mod0,
+                     variable.names=c("lnalpha"),
+                     n.iter=20000)
+
+
+acf(fit.mod0$BUGSoutput$sims.array[,1])
+
+str(fit.mod0)
 
 ##### model output (predictions, etc.)
 ###### pred. vs. estms.
