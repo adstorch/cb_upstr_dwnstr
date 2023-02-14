@@ -1,13 +1,15 @@
 # model 0: global model (non-hierarchical) --------------------------------
 ## specify data
-mod0.dat<- list(log_RS=as.numeric(log(cb_upstr_dwnstr.dat$rs)),
-                S=cb_upstr_dwnstr.dat$tot_spnrs,
-                cov1=cb_upstr_dwnstr.dat$cov1,  #placeholder
-                cov2=cb_upstr_dwnstr.dat$cov2,  #placeholder
-                cov3=cb_upstr_dwnstr.dat$cov3,  #placeholder
-                # basin=cb_upstr_dwnstr.dat$basin_index,
-                nObs=length(cb_upstr_dwnstr.dat$rs))
-                # nBasin=max(cb_upstr_dwnstr.dat$basin_index))
+cb_upstr_dwnstr.GRCATdat <- subset(cb_upstr_dwnstr.dat,popn=="grcat")
+
+mod0.dat<- list(log_RS=as.numeric(log(cb_upstr_dwnstr.GRCATdat$rs)),
+                S=cb_upstr_dwnstr.GRCATdat$tot_spnrs,
+                cov1=cb_upstr_dwnstr.GRCATdat$cov1,  #placeholder
+                cov2=cb_upstr_dwnstr.GRCATdat$cov2,  #placeholder
+                cov3=cb_upstr_dwnstr.GRCATdat$cov3,  #placeholder
+                # basin=cb_upstr_dwnstr.GRCATdat$basin_index,
+                nObs=length(cb_upstr_dwnstr.GRCATdat$rs))
+                # nBasin=max(cb_upstr_dwnstr.GRCATdat$basin_index))
 
 ## specify model
 cat('
@@ -512,18 +514,96 @@ dev.off()
 ###### auto-correlation
 update(fit.mod0, 10000)
 ####### log(alpha)
-post.lnalpha <- jags.samples(fit.mod0,
-                     variable.names=c("lnalpha"),
-                     n.iter=20000)
 
 
-test <- autocorr.diag(mod0.mcmc)
-raftery.diag(mod0.mcmc)
+###### raftery diagnostics
+mod0.raftery <- raftery.diag(mod0.mcmc)
+mod0_raftery.dat <- rbind(data.frame(chain=1,setDT(as.data.frame(mod0.raftery[[1]][["resmatrix"]]), keep.rownames = TRUE)[]),
+                          data.frame(chain=2,setDT(as.data.frame(mod0.raftery[[2]][["resmatrix"]]), keep.rownames = TRUE)[]),
+                          data.frame(chain=3,setDT(as.data.frame(mod0.raftery[[3]][["resmatrix"]]), keep.rownames = TRUE)[]))
 
-data.frame(b1 = test[,2],
-           b2 = test[,2])
+flextable(mod0_raftery.dat) %>%
+  set_header_labels(rn = "Parameter",
+                    M = "M",
+                    N = "N",
+                    Nmin = "Nmin",
+                    I = "I") %>%
+  # merge_at(i = 1,
+  #          j = 2:7,
+  #          part = "header") %>%
+  # merge_at(i = 1,
+  #          j = 9:10,
+  #          part = "header") %>%
+  # add_header_row(values = c("Stock",
+  #                           "Non-tribal Commercial Mainstem",
+  #                           "Commercial Select Areas",
+  #                           "Sport", "Sport Select Areas",
+  #                           "Test",
+  #                           "Treaty Tribal",
+  #                           "",
+  #                           "Sport",
+  #                           "Treaty Tribal",
+  #                           "Wanapum Tribal",
+  #                           "Snake River Sport",
+  #                           "Total Harvest or Impact"),
+  #                top = FALSE ) %>%
+  set_formatter(M = function(x) ifelse(is.na(x),"", formatC(x,digits = 0, format = "f", big.mark = ",")),
+                N = function(x) ifelse(is.na(x),"", formatC(x,digits = 0, format = "f", big.mark = ",")),
+                Nmin = function(x) ifelse(is.na(x),"", formatC(x,digits = 0, format = "f", big.mark = ",")),
+                I = function(x) ifelse(is.na(x),"", formatC(x,digits = 0, format = "f", big.mark = ","))) %>%
+  fontsize(size = 10,
+           part = "all") %>%
+  font(fontname = "Times New Roman",
+       part = "all") %>%
+  align(align = "center",
+        part = "all") %>%
+  valign(i = 2,
+         valign = "bottom",
+         part = "header") %>%
+  border_remove() %>%
+  # width(j = 1,1) %>%
+  # width(j = c(2:7,9:13),0.8) %>%
+  # width(j = 8,0.1) %>%
+  hline_top(part="header",
+            border = fp_border(color="black",
+                               width = 2)) %>%
+  hline_bottom(part="body",
+               border = fp_border(color="black",
+                                  width = 2)) %>%
+  hline(i=1,
+        part="header",
+        border = fp_border(color="black",
+                           width = 1))
+  # hline(i=1,
+  #       j = 9:10,
+  #       part="header",
+  #       border = fp_border(color="black",
+  #                          width = 1)) %>%
+  # hline(i=2,
+  #       part="header",
+  #       border = fp_border(color="black",
+  #                          width = 1)) %>%
+  # footnote(i = 1,
+  #          j=1,
+  #          value = as_paragraph(c("Lower Columbia and Willamette Stocks do not count towards treaty non-treaty allocation or catch balance.")),
+  #          ref_symbols = c("1"),
+  #          part = "body") %>%
+  # footnote(i = 2,
+  #          j=7,
+  #          value = as_paragraph(c("Includes fish donated from test fisheries.")),
+  #          ref_symbols = c("2"),
+  #          part = "header") %>%
+  # footnote(i = 2,
+  #          j=9,
+  #          value = as_paragraph(c("Zone 6 value includes any 'upper Columbia sport'")),
+  #          ref_symbols = c("3"),
+  #          part = "header") %>%
+  # font(fontname = "Times New Roman",
+  #      part = "footer") %>%
+  # set_caption(caption = paste(as.numeric(format(Sys.time(), '%Y'))-1, " total mainstem spring Chinook harvest and release mortalities.",sep=""),
+  #             autonum = autonumTab)
 
-test
+
 
 ##### plots
 ###### pred. vs. estms.
@@ -553,8 +633,8 @@ mod0.fit.pred = mod0.coefs %*% t(mod0.Xmat)
 mod0.newdata = mod0.newdata %>% cbind(tidyMCMC(mod0.fit.pred, conf.int = TRUE, conf.method = "HPDinterval"))
 
 ######## manipulate data for plotting
-mod0.plotData <- data.frame(brd_yr = cb_upstr_dwnstr.dat$brd_yr,
-                            lnrs = log(cb_upstr_dwnstr.dat$rs),
+mod0.plotData <- data.frame(brd_yr = cb_upstr_dwnstr.GRCATdat$brd_yr,
+                            lnrs = log(cb_upstr_dwnstr.GRCATdat$rs),
                             mod0.newdata)
 
 ######## generate plot

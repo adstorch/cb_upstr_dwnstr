@@ -18,7 +18,9 @@ packages <- c("openxlsx",
               "ggmcmc",
               "scales",
               "postpack",
-              "MCMCvis")
+              "MCMCvis",
+              "data.table",
+              "flextable")
 
 if (!require(install.load)) {
   install.packages("install.load")
