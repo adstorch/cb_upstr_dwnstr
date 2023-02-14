@@ -512,15 +512,15 @@ print(mod0_tau.combPlot)
 dev.off()
 
 ###### auto-correlation
-update(fit.mod0, 10000)
+# update(fit.mod0, 10000)
 ####### log(alpha)
 
 
 ###### raftery diagnostics
 mod0.raftery <- raftery.diag(mod0.mcmc)
-mod0_raftery.dat <- rbind(data.frame(chain=1,setDT(as.data.frame(mod0.raftery[[1]][["resmatrix"]]), keep.rownames = TRUE)[]),
-                          data.frame(chain=2,setDT(as.data.frame(mod0.raftery[[2]][["resmatrix"]]), keep.rownames = TRUE)[]),
-                          data.frame(chain=3,setDT(as.data.frame(mod0.raftery[[3]][["resmatrix"]]), keep.rownames = TRUE)[]))
+mod0_raftery.dat <- rbind(data.frame(Chain=c(1,rep(NA,2,nrow(as.data.frame(mod0.raftery[[1]][["resmatrix"]]))-1)),setDT(as.data.frame(mod0.raftery[[1]][["resmatrix"]]), keep.rownames = TRUE)[]),
+                          data.frame(Chain=c(2,rep(NA,2,nrow(as.data.frame(mod0.raftery[[2]][["resmatrix"]]))-1)),setDT(as.data.frame(mod0.raftery[[2]][["resmatrix"]]), keep.rownames = TRUE)[]),
+                          data.frame(Chain=c(3,rep(NA,2,nrow(as.data.frame(mod0.raftery[[3]][["resmatrix"]]))-1)),setDT(as.data.frame(mod0.raftery[[3]][["resmatrix"]]), keep.rownames = TRUE)[]))
 
 flextable(mod0_raftery.dat) %>%
   set_header_labels(rn = "Parameter",
@@ -528,42 +528,27 @@ flextable(mod0_raftery.dat) %>%
                     N = "N",
                     Nmin = "Nmin",
                     I = "I") %>%
-  # merge_at(i = 1,
-  #          j = 2:7,
-  #          part = "header") %>%
-  # merge_at(i = 1,
-  #          j = 9:10,
-  #          part = "header") %>%
-  # add_header_row(values = c("Stock",
-  #                           "Non-tribal Commercial Mainstem",
-  #                           "Commercial Select Areas",
-  #                           "Sport", "Sport Select Areas",
-  #                           "Test",
-  #                           "Treaty Tribal",
-  #                           "",
-  #                           "Sport",
-  #                           "Treaty Tribal",
-  #                           "Wanapum Tribal",
-  #                           "Snake River Sport",
-  #                           "Total Harvest or Impact"),
-  #                top = FALSE ) %>%
   set_formatter(M = function(x) ifelse(is.na(x),"", formatC(x,digits = 0, format = "f", big.mark = ",")),
                 N = function(x) ifelse(is.na(x),"", formatC(x,digits = 0, format = "f", big.mark = ",")),
                 Nmin = function(x) ifelse(is.na(x),"", formatC(x,digits = 0, format = "f", big.mark = ",")),
                 I = function(x) ifelse(is.na(x),"", formatC(x,digits = 0, format = "f", big.mark = ","))) %>%
+  padding(i= nrow(mod0_raftery.dat)/3, padding = 15, padding.top = TRUE) %>%
+  padding(i= nrow(mod0_raftery.dat)/3+nrow(mod0_raftery.dat)/3, padding = 15, padding.top = TRUE) %>%
   fontsize(size = 10,
            part = "all") %>%
   font(fontname = "Times New Roman",
        part = "all") %>%
   align(align = "center",
         part = "all") %>%
-  valign(i = 2,
-         valign = "bottom",
-         part = "header") %>%
+  
+  font(fontname = "Times New Roman",
+       part = "footer") %>%
+  align(align = "center",
+        part = "footer") %>%
+  
+  
+  
   border_remove() %>%
-  # width(j = 1,1) %>%
-  # width(j = c(2:7,9:13),0.8) %>%
-  # width(j = 8,0.1) %>%
   hline_top(part="header",
             border = fp_border(color="black",
                                width = 2)) %>%
@@ -573,7 +558,18 @@ flextable(mod0_raftery.dat) %>%
   hline(i=1,
         part="header",
         border = fp_border(color="black",
-                           width = 1))
+                           width = 1)) %>%
+
+  add_footer_lines(top=FALSE,
+                   value = as_paragraph(c("Note: bold values indicate overage."))) %>%
+  
+# footnote(i = 1,
+#          j=1,
+#          value = as_paragraph(c("Note: bold values indicate overage.")),
+#          ref_symbols = c(""),
+#          part = "header") %>%
+#   font(fontname = "Times New Roman",
+#        part = "footer")
   # hline(i=1,
   #       j = 9:10,
   #       part="header",
@@ -583,11 +579,29 @@ flextable(mod0_raftery.dat) %>%
   #       part="header",
   #       border = fp_border(color="black",
   #                          width = 1)) %>%
-  # footnote(i = 1,
-  #          j=1,
-  #          value = as_paragraph(c("Lower Columbia and Willamette Stocks do not count towards treaty non-treaty allocation or catch balance.")),
-  #          ref_symbols = c("1"),
-  #          part = "body") %>%
+  footnote(i = 1,
+           j=3,
+           value = as_paragraph(c("Suggested burn-in period.")),
+           ref_symbols = c("1"),
+           part = "header") %>%
+  
+  footnote(i = 1,
+           j=4,
+           value = as_paragraph(c("Suggested number of iterations.")),
+           ref_symbols = c("2"),
+           part = "header") %>%
+  footnote(i = 1,
+           j=5,
+           value = as_paragraph(c("suggested number of iterations based on zero autocorrelation.")),
+           ref_symbols = c("3"),
+           part = "header") %>%
+  
+  footnote(i = 1,
+           j=6,
+           value = as_paragraph(c("Dependence factor: interpreted as the proportional increase in the number of iterations attributable to autocorrelation. Highly autocorrelated chains (> 5) are worrisome, and may be due to influential initial values, parameter correlations, or poor mixing.")),
+           ref_symbols = c("4"),
+           part = "header")
+  
   # footnote(i = 2,
   #          j=7,
   #          value = as_paragraph(c("Includes fish donated from test fisheries.")),

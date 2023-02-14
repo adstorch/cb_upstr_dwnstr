@@ -20,7 +20,8 @@ packages <- c("openxlsx",
               "postpack",
               "MCMCvis",
               "data.table",
-              "flextable")
+              "flextable",
+              "officer")
 
 if (!require(install.load)) {
   install.packages("install.load")
