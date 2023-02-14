@@ -21,7 +21,8 @@ packages <- c("openxlsx",
               "MCMCvis",
               "data.table",
               "flextable",
-              "officer")
+              "officer",
+              "webshot2")
 
 if (!require(install.load)) {
   install.packages("install.load")

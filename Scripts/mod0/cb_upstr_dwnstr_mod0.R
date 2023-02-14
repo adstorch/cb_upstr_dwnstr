@@ -517,12 +517,22 @@ dev.off()
 
 
 ###### raftery diagnostics
+####### run diagnostics
 mod0.raftery <- raftery.diag(mod0.mcmc)
+
+mod0.raftery[[1]][["params"]][3]
+
 mod0_raftery.dat <- rbind(data.frame(Chain=c(1,rep(NA,2,nrow(as.data.frame(mod0.raftery[[1]][["resmatrix"]]))-1)),setDT(as.data.frame(mod0.raftery[[1]][["resmatrix"]]), keep.rownames = TRUE)[]),
                           data.frame(Chain=c(2,rep(NA,2,nrow(as.data.frame(mod0.raftery[[2]][["resmatrix"]]))-1)),setDT(as.data.frame(mod0.raftery[[2]][["resmatrix"]]), keep.rownames = TRUE)[]),
                           data.frame(Chain=c(3,rep(NA,2,nrow(as.data.frame(mod0.raftery[[3]][["resmatrix"]]))-1)),setDT(as.data.frame(mod0.raftery[[3]][["resmatrix"]]), keep.rownames = TRUE)[]))
 
-flextable(mod0_raftery.dat) %>%
+####### generate table
+mod0_raftery.tbl <- flextable(mod0_raftery.dat) %>%
+  align(align = "center",
+        part = "all") %>%
+  valign(i = 1,
+         valign = "bottom",
+         part = "header") %>%
   set_header_labels(rn = "Parameter",
                     M = "M",
                     N = "N",
@@ -532,53 +542,25 @@ flextable(mod0_raftery.dat) %>%
                 N = function(x) ifelse(is.na(x),"", formatC(x,digits = 0, format = "f", big.mark = ",")),
                 Nmin = function(x) ifelse(is.na(x),"", formatC(x,digits = 0, format = "f", big.mark = ",")),
                 I = function(x) ifelse(is.na(x),"", formatC(x,digits = 0, format = "f", big.mark = ","))) %>%
-  padding(i= nrow(mod0_raftery.dat)/3, padding = 15, padding.top = TRUE) %>%
-  padding(i= nrow(mod0_raftery.dat)/3+nrow(mod0_raftery.dat)/3, padding = 15, padding.top = TRUE) %>%
   fontsize(size = 10,
            part = "all") %>%
   font(fontname = "Times New Roman",
        part = "all") %>%
-  align(align = "center",
-        part = "all") %>%
-  
-  font(fontname = "Times New Roman",
-       part = "footer") %>%
-  align(align = "center",
-        part = "footer") %>%
-  
-  
-  
   border_remove() %>%
+  hline(i=1,
+        part="header",
+        border = fp_border(color="black",
+                           width = 1)) %>%
   hline_top(part="header",
             border = fp_border(color="black",
                                width = 2)) %>%
   hline_bottom(part="body",
                border = fp_border(color="black",
                                   width = 2)) %>%
-  hline(i=1,
-        part="header",
-        border = fp_border(color="black",
-                           width = 1)) %>%
-
-  add_footer_lines(top=FALSE,
-                   value = as_paragraph(c("Note: bold values indicate overage."))) %>%
-  
-# footnote(i = 1,
-#          j=1,
-#          value = as_paragraph(c("Note: bold values indicate overage.")),
-#          ref_symbols = c(""),
-#          part = "header") %>%
-#   font(fontname = "Times New Roman",
-#        part = "footer")
-  # hline(i=1,
-  #       j = 9:10,
-  #       part="header",
-  #       border = fp_border(color="black",
-  #                          width = 1)) %>%
-  # hline(i=2,
-  #       part="header",
-  #       border = fp_border(color="black",
-  #                          width = 1)) %>%
+  width(j = 1:6, 1) %>%
+  bold(~ I > 5,6) %>%
+  padding(i= nrow(mod0_raftery.dat)*(1/3), padding = 15, padding.top = TRUE) %>%
+  padding(i= nrow(mod0_raftery.dat)*(2/3), padding = 15, padding.top = TRUE) %>%
   footnote(i = 1,
            j=3,
            value = as_paragraph(c("Suggested burn-in period.")),
@@ -600,22 +582,18 @@ flextable(mod0_raftery.dat) %>%
            j=6,
            value = as_paragraph(c("Dependence factor: interpreted as the proportional increase in the number of iterations attributable to autocorrelation. Highly autocorrelated chains (> 5) are worrisome, and may be due to influential initial values, parameter correlations, or poor mixing.")),
            ref_symbols = c("4"),
-           part = "header")
-  
-  # footnote(i = 2,
-  #          j=7,
-  #          value = as_paragraph(c("Includes fish donated from test fisheries.")),
-  #          ref_symbols = c("2"),
-  #          part = "header") %>%
-  # footnote(i = 2,
-  #          j=9,
-  #          value = as_paragraph(c("Zone 6 value includes any 'upper Columbia sport'")),
-  #          ref_symbols = c("3"),
-  #          part = "header") %>%
-  # font(fontname = "Times New Roman",
-  #      part = "footer") %>%
-  # set_caption(caption = paste(as.numeric(format(Sys.time(), '%Y'))-1, " total mainstem spring Chinook harvest and release mortalities.",sep=""),
-  #             autonum = autonumTab)
+           part = "header") %>%
+  font(fontname = "Times New Roman",
+       part = "footer") %>%
+  add_footer_lines(top=FALSE,
+                   value = as_paragraph(c(paste("Note: quantile(q)=",mod0.raftery[[1]][["params"]][3],"; ",
+                                        "accuracy(q)=",mod0.raftery[[1]][["params"]][1],"; ",
+                                        "probability(s)=",mod0.raftery[[1]][["params"]][2], sep="")))) %>%
+  set_caption(caption = " Raftery Diagnostics",
+              align_with_table = FALSE)
+
+####### save table as HTML
+save_as_html(mod0_raftery.tbl, path = "Output\\Tables\\Diagnostic\\MCMC\\mod0\\mod0_rafteryTbl.html")
 
 
 
