@@ -1,6 +1,3 @@
-######   this is a test#######
-
-
 # model 0: global model (non-hierarchical) --------------------------------
 ## specify data
 cb_upstr_dwnstr.GRCATdat <- subset(cb_upstr_dwnstr.dat,popn=="grcat")
